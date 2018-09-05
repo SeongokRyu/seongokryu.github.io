@@ -1,6 +1,6 @@
 ---
 layout: page
-title: GraphNN
+title: Graph NN
 tagline: Review of research in graph neural network
 ---
 

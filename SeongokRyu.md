@@ -18,8 +18,8 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
 
 ### Education {#education}
 
-2014. 02 ~ Current : Ph.D student in Chemistry, KAIST
-2009. 02 ~ 2014.02 : B.S. in Chemistry and Physics, KAIST
+* 2014'.' 02 ~ Current : Ph.D student in Chemistry, KAIST
+* 2009'.' 02 ~ 2014'.' 02 : B.S. in Chemistry and Physics, KAIST
 
 ------
 

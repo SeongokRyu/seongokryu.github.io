@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Graph Neural Network
-tagline: Review resarches in deep learning
+title: Review Researches in Deep Learning
+tagline: 
 ---
 
 [Go to the Home Page]({{ site.url }}{{ site.baseurl }})

@@ -4,7 +4,7 @@ title: Seongok Ryu
 tagline: Deparment of Chemistry, KAIST
 permalink: /SeongokRyu.html
 ---
-![profile](profile.jpg)
+![profile](./profile.jpg)
 > [sower2002@kaist.ac.kr](sower2002@kaist.ac.kr)  
 ------
 
@@ -18,8 +18,9 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
 
 ### Education {#education}
 
-* 2014. 02 ~ Current : Ph.D student in Chemistry, KAIST
-* 2009. 02 ~ 2014.02 : B.S. in Chemistry and Physics, KAIST
+2014. 02 ~ Current : Ph.D student in Chemistry, KAIST
+2009. 02 ~ 2014.02 : B.S. in Chemistry and Physics, KAIST
+
 ------
 
 
@@ -32,7 +33,7 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
   : Prediction of molecular properties with uncertainty analysis, we can be more confident in drug discovery.
  
 * Drug Discovery
-  : Overall skills is applied to design drug _in silico_. Hope to take current drug discovery strategies to the next step.
+  : Apply overall skills to design drug _in silico_. Hope to take current drug discovery strategies to the next step.
 
 -------
 

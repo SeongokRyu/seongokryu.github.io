@@ -1,6 +1,6 @@
 ---
 layout: page
-title: DrugDiscovery
+title: Drug Discovery
 tagline: Review of research and current trends in applications of deep learning for drug discovery
 ---
 

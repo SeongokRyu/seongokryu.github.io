@@ -1,12 +1,9 @@
 ---
 layout: page
 title: Seongok Ryu
-tagline: Deparment of Chemistry, KAIST
+tagline: Deparment of Chemistry, KAIST, sower2002@kaist.ac.kr
 permalink: /SeongokRyu.html
 ---
-![](seongokryu.jpg)
-> [sower2002@kaist.ac.kr](sower2002@kaist.ac.kr)  
-------
 
 ### Profile {#profile}
 
@@ -18,8 +15,8 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
 
 ### Education {#education}
 
-* 2014'.' 02 ~ Current : Ph.D student in Chemistry, KAIST
-* 2009'.' 02 ~ 2014'.' 02 : B.S. in Chemistry and Physics, KAIST
+* 2014\. 02 ~ Current : Ph.D student in Chemistry, KAIST
+* 2009\. 02 ~ 2014\. 02 : B.S. in Chemistry and Physics, KAIST
 
 ------
 

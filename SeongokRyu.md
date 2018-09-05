@@ -4,7 +4,7 @@ title: Seongok Ryu
 tagline: Deparment of Chemistry, KAIST
 permalink: /SeongokRyu.html
 ---
-![profile](./profile.jpg)
+![](seongokryu.jpg)
 > [sower2002@kaist.ac.kr](sower2002@kaist.ac.kr)  
 ------
 

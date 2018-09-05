@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Seongok Ryu
+title: SEONGOK RYU
 tagline: Deparment of Chemistry, KAIST, sower2002@kaist.ac.kr
-permalink: /SeongokRyu.html
+permalink: /SEONGOKRYU.html
 ---
 
 ### Profile {#profile}

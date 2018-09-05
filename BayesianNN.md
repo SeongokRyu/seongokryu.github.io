@@ -1,6 +1,6 @@
 ---
 layout: page
-title: BayesianNN
+title: Bayesian NN
 tagline: Review of research in Bayesian neural network
 ---
 

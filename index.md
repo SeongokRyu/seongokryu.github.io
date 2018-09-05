@@ -7,4 +7,5 @@
 #
 layout: home
 ---
-# Hi, I am Seongok Ryu, Ph.d Candidate at department of chemistry at Korea Advanced Institute of Science and Techonology (KAIST). 
+
+Hi, I am Seongok Ryu, Ph.d Candidate at department of chemistry at Korea Advanced Institute of Science and Techonology (KAIST). 

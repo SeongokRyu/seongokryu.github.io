@@ -9,7 +9,7 @@ permalink: /SeongokRyu.html
 
 Hi, I am a Ph.D. student in the department of chemistry at Korea Advanced Institute of Science and Technology (KAIST). At the beginning of the graduate school, I studied quantum chemistry and am one of the developer of quantum chemistry package, ‘ACE-Molecule’. ACE-Molecule performs density functional theory (DFT) and post Hartree-Fock calculations with using real-space grid basis. I implemented geometry optimization and super-sampling method which accelerates calculations.
 
-In recent days, I have been attracted to applications of deep learning on various field. Especially, I have developed deep learning models for drug discovery including from supervised learning model to generative models. In order for our models to be realized in real-life drug discovery, I studied learning tasks with few data, uncertainty assessment for AI-safety and conditional generative models for de novo designs of target candidates. I believe what I have studied can contribute not only on molecular applications, but also on other field. 
+In recent days, I have been attracted to applications of deep learning on various field. Especially, I have developed deep learning models for drug discovery from supervised learning model to generative models. In order for our models to be realized in real-life drug discovery, I studied approaches to train tasks with few data, uncertainty assessment for AI-safety and conditional generative models for de novo designs of target candidates. I believe what I have studied can contribute not only on molecular applications, but also on other fields. 
 
 ------
 

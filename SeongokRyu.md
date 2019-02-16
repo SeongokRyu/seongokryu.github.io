@@ -9,7 +9,7 @@ permalink: /SeongokRyu.html
 
 Hi, I am a Ph.D. student in the department of chemistry at Korea Advanced Institute of Science and Technology (KAIST). At the beginning of the graduate school, I studied quantum chemistry and am one of the developer of quantum chemistry package, ‘ACE-Molecule’. ACE-Molecule performs density functional theory (DFT) and post Hartree-Fock calculations with using real-space grid basis. I implemented geometry optimization and super-sampling method which accelerates calculations.
 
-In recent days, I am completely attracted to Deep Learning - especially graph neural network and Bayesian neural network. Graph neural network is suitable for molecular applications because molecules can be represented in graph structures. I developed models to understand how graph neural networks learn molecular science, and applied GNN for efficient drug discovery. Moreover, I hope uncertainty analysis using Bayesian statistics will make us confident in using the neural networks.
+In recent days, I have been attracted to applications of deep learning on various field. Especially, I have developed deep learning models for drug discovery including from supervised learning model to generative models. In order for our models to be realized in real-life drug discovery, I studied learning tasks with few data, uncertainty assessment for AI-safety and conditional generative models for de novo designs of target candidates. I believe what I have studied can contribute not only on molecular applications, but also on other field. 
 
 ------
 
@@ -19,7 +19,6 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
 * 2009\. 02 ~ 2014\. 02 : B.S. in Chemistry and Physics, KAIST
 
 ------
-
 
 ### Research Interest {#research_interest}
 
@@ -37,9 +36,10 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
  
 * Applications of Deep Learning for Drug Discovery
   : Have been applying overall skills to design drug _in silico_. Our group have developed various models to realize drug discovery from _in silico_ to _in real-life_. 
+
 -------
 
-### Teaching experience
+### Teaching experience {#teaching_exprience}
 
 * General Chemistry Experiment I - 2014 Spring
 * Chemistry Experiment I - 2016 Fall

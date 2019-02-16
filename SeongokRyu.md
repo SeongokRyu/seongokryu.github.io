@@ -27,7 +27,7 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
   : Graph neural network is one of the most suitable deep neural network architecutre for molecular science.
 
 * Bayesian Deep Learning
-  : Knowing what we don't know about our data and model is as important as development of deep learnikng model itself. For this purpose, I have studied Bayesian Deep Learning to apply uncertainty estimation methods on my research topics. \
+  : Knowing what we don't know about our data and model is as important as development of deep learnikng model itself. For this purpose, I have studied Bayesian Deep Learning to apply uncertainty estimation methods on my research topics.
   
 * Learning Tasks with Few Data
   : In most of the real-life case, unfortunately, it is hard to obtain a large amount of data. Lack of data is very common and critical problem in drug discovery related applications. To tackle such problems, I have interested in topics such as transfer learning and meta learning.
@@ -39,12 +39,21 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
   : Have been applying overall skills to design drug _in silico_. Our group have developed various models to realize drug discovery from _in silico_ to _in real-life_. 
 -------
 
+### Teaching experience
+
+* General Chemistry Experiment I - 2014 Spring
+* Chemistry Experiment I - 2016 Fall
+* Physical Chemistry I - 2015 Spring, 2016 Spring, 2017 Spring and 2018 Spring 
+* Physical Chemistry II - 2015 Fall and 2017 Fall
+* Artificial Intelligence and Chemistry - 2018 Fall
+
+-------
+
 ### Technical {#technical}
 
 1. C++
 1. Python
-1. TensorFlow and Keras
-1. PyTorch
+1. TensorFlow, Keras and PyTorch
 1. Linux
 
 ------
@@ -53,6 +62,7 @@ In recent days, I am completely attracted to Deep Learning - especially graph ne
 
 Uncertainty qunatification of molecular property prediction using Bayesian neural network models
 : __Seongok Ryu__, Yongchan Kwon, and Woo Youn Kim, Workshop on "Machine Learning for Molecules and Materials" @ NeurIPS 2018
+
 
 Deeply learning molecular structure-property relationships using graph attention neural network
 : __Seongok Ryu__, Jaechang Lim, and Woo Youn Kim. arXiv:1805.10988 (2018)

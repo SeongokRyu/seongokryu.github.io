@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Bayesian NN
-tagline: Review of research in Bayesian neural network
+title: Blog
+tagline: My reviews about deep learning applications on everything
 ---
 
 [Go to the Home Page]({{ site.url }}{{ site.baseurl }})

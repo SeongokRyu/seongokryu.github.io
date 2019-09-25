@@ -7,9 +7,13 @@ permalink: /SeongokRyu.html
 
 ### Profile {#profile}
 
-Hi, I am a Ph.D. student in the department of chemistry at Korea Advanced Institute of Science and Technology (KAIST). At the beginning of the graduate school, I studied quantum chemistry and am one of the developer of quantum chemistry package, ‘ACE-Molecule’. ACE-Molecule performs density functional theory (DFT) and post Hartree-Fock calculations with using real-space grid basis. I implemented geometry optimization and super-sampling method which accelerates calculations.
+Hi, I am a Ph.D. student in the department of chemistry at Korea Advanced Institute of Science and Technology (KAIST). 
+At the beginning of my Ph.D course, I studied quantum chemistry and participated to develop a quantum chemistry package, ‘ACE-Molecule’. ACE-Molecule performs quantum chemistry calculations based on density functional theory (DFT) and post Hartree-Fock by using real-space grid basis. 
+I implemented a geometry optimization module and a super-sampling method.
 
-In recent days, I have been attracted to applications of deep learning on various field. Especially, I have developed deep learning models for drug discovery from supervised learning model to generative models. In order for our models to be realized in real-life drug discovery, I studied approaches to train tasks with few data, uncertainty assessment for AI-safety and conditional generative models for de novo designs of target candidates. I believe what I have studied can contribute not only on molecular applications, but also on other fields. 
+In recent days, I have studied to develop computational models based on deep neural networks for molecular applications. 
+In this field, molecules are usually digitized by graph structure and limited amount of labeled data is usually given. 
+Therefore, considering such situation, my research interest has been focused on graph neural networks, generative models of molecules, Bayesian deep learning and data-efficient statistical learning algorithms. 
 
 ------
 
@@ -22,20 +26,15 @@ In recent days, I have been attracted to applications of deep learning on variou
 
 ### Research Interest {#research_interest}
 
-* Graph Neural Network
-  : Graph neural network is one of the most suitable deep neural network architecutre for molecular science.
+* Graph Neural Networks
+
+* Generative Models of Molecules
 
 * Bayesian Deep Learning
-  : Knowing what we don't know about our data and model is as important as development of deep learnikng model itself. For this purpose, I have studied Bayesian Deep Learning to apply uncertainty estimation methods on my research topics.
-  
-* Learning Tasks with Few Data
-  : In most of the real-life case, unfortunately, it is hard to obtain a large amount of data. Lack of data is very common and critical problem in drug discovery related applications. To tackle such problems, I have interested in topics such as transfer learning and meta learning.
-  
-* Generative Models and Data Embedding
-  : Even though screening molecules from molecular libraries have been successfully adopted, finding the most desired candidates from the library is like finding a needls in a haystack. To design molecules, not to discovery, deep generative models have been developed. Especially, I think that deep latent variable models have been promising for molecualr applications.
  
 * Applications of Deep Learning for Drug Discovery
-  : Have been applying overall skills to design drug _in silico_. Our group have developed various models to realize drug discovery from _in silico_ to _in real-life_. 
+
+* Data Efficient Deep Learning with Self-supervised Learning, Transfer Learning, etc..
 
 -------
 
@@ -53,18 +52,23 @@ In recent days, I have been attracted to applications of deep learning on variou
 
 1. C++
 1. Python
-1. TensorFlow, Keras and PyTorch
+1. TensorFlow and PyTorch
 1. Linux
 
 ------
 
 ### Publications {#publications}
 
-Uncertainty qunatification of molecular property prediction using Bayesian neural network models
-: __Seongok Ryu__, Yongchan Kwon, and Woo Youn Kim, Workshop on "Machine Learning for Molecules and Materials" @ NeurIPS 2018
 
 
-Deeply learning molecular structure-property relationships using graph attention neural network
+Predicting Drug-target Interaction Using a Novel Graph Neural Network with 3D Structure-embedded Graph Representation
+: Jaechang Lim, __Seongok Ryu__, Kyubyong Park, Yojoong Choe, Jiyeon Ham, and Woo Youn Kim, Journal of Chemical Information and Modeling, (2019)
+
+A Bayesian graph convolutional network for reliable prediction of molecular properties with uncertainty quantification
+: __Seongok Ryu__, Yongchan Kwon, and Woo Youn Kim, Chemical Science (2019)
+
+
+Deeply learning molecular structure-property relationships using attention- and gate- augmented neural network
 : __Seongok Ryu__, Jaechang Lim, and Woo Youn Kim. arXiv:1805.10988 (2018)
 
 

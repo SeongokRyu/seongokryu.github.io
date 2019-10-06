@@ -64,6 +64,8 @@ Therefore, considering such situation, my research interest has been focused on 
 
 ### Publications {#publications}
 
+Molecular generative model based on adversarially regularized autoencoder
+: Seung Hwan Hong, Jaechang Lim, __Seongok Ryu__, Woo Youn Kim, under peer-review (2019)
 
 
 Predicting Drug-target Interaction Using a Novel Graph Neural Network with 3D Structure-embedded Graph Representation

@@ -10,6 +10,13 @@ title: Seongok Ryu
 tagline: Deparment of Chemistry, KAIST, sower2002@kaist.ac.kr
 ---
 ![](/aims.jpg)
+
+* Date of birth: October, 15, 1991
+* Address: Department of Chemistry, Korea Advanced Institute of Science and Techonology (KAIST), 291 Daehak-ro Yuseong-gu Daejeon 34141 Korea,
+* E-mail: sower2002@kasit.ac.kr
+* Github: [http://github.com/seongokryu](http://github.com/seongokryu)
+
+
 ### Profile {#profile}
 
 Hi, I am a Ph.D. student in the department of chemistry at Korea Advanced Institute of Science and Technology (KAIST). 
@@ -32,13 +39,9 @@ Therefore, considering such situation, my research interest has been focused on 
 ### Research Interest {#research_interest}
 
 * Graph Neural Networks
-
 * Generative Models of Molecules
-
 * Bayesian Deep Learning
- 
 * Applications of Deep Learning for Drug Discovery
-
 * Data Efficient Deep Learning with Self-supervised Learning, Transfer Learning, etc..
 
 -------

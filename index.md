@@ -7,7 +7,7 @@
 #
 layout: home
 title: Seongok Ryu
-tagline: Deparment of Chemistry, KAIST, sower2002@kaist.ac.kr
+tagline: Research Scientist, AITRICS, seongokryu@aitrics.com
 ---
 ![](/aims.jpg)
 

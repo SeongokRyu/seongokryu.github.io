@@ -193,6 +193,8 @@ AFDB Quaternary Data Generation Pipeline:
           57K tentatively high-confidence heterodimers
 ```
 
+The central quality metric is **ipSAE** (interaction prediction Score from Aligned Errors) — a metric derived from PAE (Predicted Aligned Error) matrices that quantifies interface quality between chains. AlphaFold-Multimer produces PAE matrices predicting the positional error of each residue when the structure is aligned on a different residue. ipSAE converts these inter-chain PAE values into a scalar interface confidence score. Crucially, ipSAE is **directional**: the score for chain A aligned relative to chain B differs from B relative to A. The study defines $\text{ipSAE}\_{min} = \min(\text{ipSAE}\_{A \to B},\; \text{ipSAE}\_{B \to A})$ as a conservative, single-value estimate of interface quality. Among the four candidate metrics evaluated (ipTM, ipSAE, LIS, pDockQ2), $\text{ipSAE}\_{min}$ showed the clearest distributional separation between true homodimers and monomers, with F1 = 0.744 (precision 0.859, recall 0.655) at the $\geq 0.6$ cutoff.
+
 The quality filtering reveals a key asymmetry: only ~7% of homodimer predictions meet the high-confidence threshold, and heterodimer predictions have even lower retention rates. This reflects the fundamental difficulty of interface prediction — modeling how two protein surfaces interact requires capturing subtle coevolutionary signals that are diluted or absent in MSAs.
 
 The high-confidence complexes are classified into three tiers:

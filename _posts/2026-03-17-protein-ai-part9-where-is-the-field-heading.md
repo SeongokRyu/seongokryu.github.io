@@ -123,7 +123,35 @@ The field has traced an arc from physics through pure data back toward physics:
 
 The progression suggests that **pure data-driven learning hits diminishing returns** — physics-based priors provide the right inductive biases for problems where data is scarce (conformational ensembles, rare folds, out-of-distribution molecules). This parallels similar trends in other scientific ML domains.
 
-### 2.4 "What We Thought Was Essential, Wasn't"
+### 2.4 Data as the New Competitive Axis
+
+A pattern that emerged most clearly in Part 8: as architectures converge, **data becomes the primary differentiator**.
+
+```
+2021  AF2: Architecture is the breakthrough
+      → Evoformer + IPA = unprecedented accuracy
+      → Data (PDB) is necessary but not the innovation
+
+2024  AF3/Boltz/Chai: Architecture converges (Pairformer + Diffusion)
+      → Open-source matches AF3 on architecture alone
+      → Differentiation begins to shift toward data strategy
+
+2025  SeedFold: 26.5M distillation data is essential, not optional
+      → Removing distillation mid-training causes immediate degradation
+      → Architecture needs data volume to compensate for lost inductive bias
+
+2026  IsoDDE: Proprietary experimental data creates the performance gap
+      → Same architecture family as open-source models
+      → Decisive advantage: internal binding data at scale
+
+2026  AFDB Quaternary: Open data ecosystem expands to complexes
+      → 1.8M high-confidence dimeric structures now publicly available
+      → Open-source community gains interface data that was previously scarce
+```
+
+The implication: the "data pyramid" (Part 8) — sequences (billions) > synthetic structures (millions) > experimental structures (hundreds of thousands) > functional data (tens of thousands) — defines the landscape of competitive advantage. Each layer is harder to acquire than the one below it, and the scarcest layer (proprietary functional data) is increasingly where competitive moats form.
+
+### 2.5 "What We Thought Was Essential, Wasn't"
 
 A recurring pattern of elimination:
 
@@ -358,7 +386,17 @@ IsoDDE (Isomorphic Labs, 2026) signals the direction: a single model predicting 
 
 **Prediction**: By 2027, the leading protein AI models will be multi-task: structure prediction, confidence, affinity, design, and property prediction sharing a common Trunk. The competitive differentiation will shift from architecture (converged) to **data** (proprietary experimental datasets) and **integration** (speed of the design–test loop).
 
-### 6.5 Democratization of Access
+### 6.5 The Data Ecosystem: Expansion and Risk
+
+The data landscape (Part 8) is evolving along three dimensions that will shape 2026–2027:
+
+**AFDB Quaternary Expansion**: The 2026 expansion of the AlphaFold Database to proteome-scale quaternary structures (Han et al.) added 31M dimeric complex predictions, of which 1.8M meet high-confidence thresholds. Unlike monomeric AFDB, these contain **interface information** — directly usable for training binder design and PPI prediction models. This public resource partially addresses the data scarcity that previously limited complex-aware model training to PDB's ~tens of thousands of experimental multimers.
+
+**Continuous distillation as requirement**: SeedFold's ablation (Part 8) established that distillation data is not merely useful for pre-training — it must be maintained throughout training. Removing it at step 47,612 caused immediate accuracy degradation. This finding has architectural implications: post-AF2 models that replaced IPA's geometric inductive bias with general-purpose diffusion transformers fundamentally need more data to generalize. The 180K PDB structures are insufficient; distillation at scale (SeedFold: 26.5M, OpenFold3: 13M) is now a requirement, not an optimization.
+
+**The data flywheel and model collapse risk**: As each generation of models generates synthetic training data for the next (AF2 → AFDB → Boltz-2/NP3 → next generation), a recursive loop forms. This flywheel drives improvement but carries the risk of **model collapse** — systematic errors reinforced rather than corrected across generations. The role of experimental PDB data as a "ground truth anchor" becomes increasingly critical. Whether the open-source community can sustain the flywheel without access to proprietary experimental data (IsoDDE's advantage) remains the central strategic question.
+
+### 6.6 Democratization of Access
 
 The barrier to using protein AI has dropped dramatically:
 
@@ -469,6 +507,7 @@ The choice between restrictive (AF3: academic-only) and permissive (Boltz-2: MIT
 
 2026  IsoDDE: Multi-task drug design engine (Isomorphic Labs)
       Pairmixer: Attention-free Trunk ("Triangle Multiplication Is All You Need")
+      AFDB Quaternary: Proteome-scale complex predictions (31M dimers, 1.8M HC)
 
 
 [Technical Axis Transitions]
@@ -479,6 +518,7 @@ Generation:  IPA → Diffusion (EDM) → Flow Matching
 Scope:       Monomer → Complex → All-atom co-folding
 Purpose:     Prediction → Design → Ensemble
 Training:    DDP → FSDP, FP32 → BF16, single-stage → multi-stage
+Data:        PDB only → PDB + distillation → PDB + AFDB + synthetic complexes
 
 
 [Lineage Map]
@@ -524,15 +564,17 @@ Pairmixer (2026) ─── Attention-free Trunk
 
 ### What this series traced
 
-Over eight installments, we followed one core question: **why did each model make the technical choices it did?** The answers revealed a field that is simultaneously converging (Pairformer, Flow Matching, all-atom scope, standard training stack) and diversifying (design representations, conformational diversity approaches, commercial vs. open-source strategies).
+Over nine installments, we followed one core question: **why did each model make the technical choices it did?** The answers revealed a field that is simultaneously converging (Pairformer, Flow Matching, all-atom scope, standard training stack) and diversifying (design representations, conformational diversity approaches, commercial vs. open-source strategies).
 
-### The three most important lessons
+### The four most important lessons
 
 **1. Representations matter more than generation methods.** The Trunk — how a model represents residue-pair relationships — has been the most stable and valuable component across all model generations. Generation methods (IPA, diffusion, flow matching) have changed rapidly, but the pair representation $z_{ij}$ and the triangular operations that update it have persisted from Evoformer through Pairmixer. Investing in better representations pays off across all downstream tasks.
 
 **2. Elimination is as important as innovation.** Some of the field's most impactful contributions were removals: RF2 removing IPA, Pairmixer removing attention, ESMFold removing MSA dependence. Each removal simplified the architecture, reduced computational cost, and clarified what is truly essential. The minimal architecture — Triangle Multiplication + FFN for the Trunk, flow matching for generation — may be close to the irreducible core.
 
-**3. Engineering is a first-class design decision.** Part 7 showed that the same architecture trained with different engineering produces different results. The gap between "published architecture" and "working system" is filled by crop strategies, precision management, distributed training configuration, and multi-stage curricula. Open-source models that share training code (Boltz-2, OpenFold3, Proteina) contribute as much through their engineering as through their architecture.
+**3. Engineering and data are first-class design decisions.** Part 7 showed that the same architecture trained with different engineering produces different results. Part 8 showed that the same architecture trained with different data produces different results. The gap between "published architecture" and "working system" is filled by crop strategies, precision management, distillation pipelines, and data mixing ratios. As architectures converge, the competitive frontier shifts to data — who has the best experimental measurements (IsoDDE), who generates the best synthetic structures (AFDB, Teddymer), and who mixes them most effectively (Boltz-2's 60/40, SeedFold's 50/50).
+
+**4. Open data accelerates the entire field.** The AFDB — from 360K monomers (2021) to 214M monomers (2024) to 31M quaternary complexes (2026) — has been the single most impactful public resource in protein AI. Models trained on AFDB-derived data (NP3, Boltz-2, SeedFold) collectively outperform models without it. The expansion to quaternary structures provides interface information that was previously available only through the PDB's limited set of experimental complexes. Open data creates a rising tide that lifts all models — while proprietary data creates moats that only individual organizations can cross.
 
 ### What comes next
 

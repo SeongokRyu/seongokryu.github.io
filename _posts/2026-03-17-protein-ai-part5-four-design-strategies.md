@@ -1,7 +1,7 @@
 ---
 title: "Protein AI Series Part 5: Four Design Strategies Compared"
 date: 2026-03-17 09:50:00 +0900
-categories: [Drug Discovery]
+categories: [Drug Discovery, Foundation Model]
 tags: [protein-ai, protein-design, rfdiffusion, boltzgen, esm3, flow-matching]
 math: true
 ---

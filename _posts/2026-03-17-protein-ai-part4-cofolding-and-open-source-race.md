@@ -1,7 +1,7 @@
 ---
 title: "Protein AI Series Part 4: Co-Folding and the Open-Source Race"
 date: 2026-03-17 09:40:00 +0900
-categories: [Drug Discovery]
+categories: [Drug Discovery, Foundation Model]
 tags: [protein-ai, co-folding, alphafold3, boltz, open-source]
 math: true
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Protein AI Series Part 8: The Data Landscape"
 date: 2026-03-17 10:20:00 +0900
-categories: [Drug Discovery]
+categories: [Drug Discovery, Foundation Model]
 tags: [protein-ai, training-data, pdb, alphafold-database, knowledge-distillation]
 math: true
 ---

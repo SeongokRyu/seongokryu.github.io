@@ -1,7 +1,7 @@
 ---
 title: "Protein AI Series Part 0: What Is Protein Structure Prediction?"
 date: 2026-03-17 09:00:00 +0900
-categories: [Drug Discovery]
+categories: [Drug Discovery, Foundation Model]
 tags: [protein-ai, structure-prediction, alphafold, deep-learning]
 math: true
 ---

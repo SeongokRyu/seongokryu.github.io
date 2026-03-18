@@ -1,7 +1,7 @@
 ---
 title: "Protein AI Series Part 7: Training Engineering and Scaling"
 date: 2026-03-17 10:10:00 +0900
-categories: [Drug Discovery]
+categories: [Drug Discovery, Foundation Model]
 tags: [protein-ai, training-engineering, flashattention, distributed-training, scaling-laws]
 math: true
 ---

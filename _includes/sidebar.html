@@ -46,6 +46,25 @@
         <!-- .nav-item -->
       {% endfor %}
     </ul>
+
+    <!-- Main Categories -->
+    <div class="sidebar-categories w-100 ps-0 mt-2">
+      <hr class="mx-3 my-1" style="border-color: var(--sidebar-muted-color, #868e96); opacity: 0.3;">
+      <ul class="nav flex-column" style="font-size: 0.85rem;">
+        {% assign main_categories = "Drug Discovery,Engineering,AI & ML,Startup & Investment,Career" | split: "," %}
+        {% assign cat_icons = "fas fa-pills,fas fa-cogs,fas fa-brain,fas fa-chart-line,fas fa-briefcase" | split: "," %}
+        {% for cat in main_categories %}
+          {% assign cat_slug = cat | slugify %}
+          <li class="nav-item">
+            <a href="{{ '/categories/' | append: cat_slug | append: '/' | relative_url }}" class="nav-link py-1 ps-3"
+              {% if page.title == cat %}style="color: var(--sidebar-active-color, #fff);"{% endif %}>
+              <i class="fa-fw {{ cat_icons[forloop.index0] }} me-1" style="font-size: 0.8rem;"></i>
+              <span>{{ cat }}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
   </nav>
 
   <div class="sidebar-bottom d-flex flex-wrap  align-items-center w-100">

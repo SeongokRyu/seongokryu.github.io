@@ -13,6 +13,14 @@
 - type: rss
   icon: "fas fa-rss"
   noblank: true
+
+- type: google-scholar
+  icon: "fas fa-graduation-cap"
+  url: "https://scholar.google.com/citations?user=VpdvdvEAAAAJ&hl=ko"
+
+- type: linkedin
+  icon: "fab fa-linkedin"
+  url: "https://www.linkedin.com/in/seongok-ryu-502b91249/"
 # Uncomment and complete the url below to enable more contact options
 #
 # - type: mastodon

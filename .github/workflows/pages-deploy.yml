@@ -45,6 +45,87 @@ jobs:
           ruby-version: 3.3
           bundler-cache: true
 
+      - name: Validate front matter
+        run: |
+          echo "Checking required front matter fields..."
+          errors=0
+          for f in _posts/*.md; do
+            # Extract front matter (between --- delimiters)
+            fm=$(sed -n '/^---$/,/^---$/p' "$f" | head -20)
+
+            # Check title
+            if ! echo "$fm" | grep -q '^title:'; then
+              echo "ERROR: Missing 'title' in $f"
+              errors=$((errors + 1))
+            fi
+
+            # Check date
+            if ! echo "$fm" | grep -q '^date:'; then
+              echo "ERROR: Missing 'date' in $f"
+              errors=$((errors + 1))
+            fi
+
+            # Check categories
+            if ! echo "$fm" | grep -q '^categories:'; then
+              echo "ERROR: Missing 'categories' in $f"
+              errors=$((errors + 1))
+            fi
+
+            # Check tags
+            if ! echo "$fm" | grep -q '^tags:'; then
+              echo "WARNING: Missing 'tags' in $f"
+            fi
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "Found $errors front matter errors!"
+            exit 1
+          fi
+          echo "All front matter checks passed."
+
+      - name: Check for referenced images
+        run: |
+          echo "Checking image references in posts..."
+          errors=0
+          for f in _posts/*.md; do
+            # Find markdown image references ![alt](path)
+            grep -oP '!\[.*?\]\(\K[^)]+' "$f" 2>/dev/null | while read -r img; do
+              # Skip external URLs
+              if echo "$img" | grep -qE '^https?://'; then
+                continue
+              fi
+              # Strip leading / for local path check
+              local_path="${img#/}"
+              if [ ! -f "$local_path" ]; then
+                echo "ERROR: Image not found: $img (referenced in $f)"
+                errors=$((errors + 1))
+              fi
+            done
+          done
+
+          # Also check that avatar image exists if configured
+          avatar=$(grep '^avatar:' _config.yml | sed 's/avatar: *//' | sed 's/^ *//')
+          if [ -n "$avatar" ]; then
+            local_avatar="${avatar#/}"
+            if [ ! -f "$local_avatar" ]; then
+              echo "ERROR: Avatar image not found: $avatar"
+              errors=$((errors + 1))
+            fi
+          fi
+
+          if [ $errors -gt 0 ]; then
+            echo "Found $errors missing images!"
+            exit 1
+          fi
+          echo "All image references valid."
+
+      - name: Lint markdown
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: '_posts/*.md'
+          config: '.markdownlint.json'
+        continue-on-error: true
+
       - name: Build site
         run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
         env:

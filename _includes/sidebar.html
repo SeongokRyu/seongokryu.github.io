@@ -47,44 +47,8 @@
       {% endfor %}
     </ul>
 
-    <!-- Main Categories -->
-    <div class="sidebar-categories w-100 ps-0 mt-2">
-      <hr class="mx-3 my-1" style="border-color: var(--sidebar-muted-color, #868e96); opacity: 0.3;">
-      <ul class="nav flex-column" style="font-size: 0.85rem;">
-        <!-- Drug Discovery with sub-categories -->
-        <li class="nav-item">
-          <a href="{{ '/categories/drug-discovery/' | relative_url }}" class="nav-link py-1 ps-3">
-            <i class="fa-fw fas fa-pills me-1" style="font-size: 0.8rem;"></i>
-            <span>Drug Discovery</span>
-          </a>
-          <ul class="nav flex-column" style="font-size: 0.8rem;">
-            {% assign dd_subs = "Foundation Model,Protein Design,Small Molecule Design,Agentic Discovery,Case Study" | split: "," %}
-            {% assign dd_icons = "fas fa-cubes,fas fa-dna,fas fa-atom,fas fa-robot,fas fa-microscope" | split: "," %}
-            {% for sub in dd_subs %}
-              {% assign sub_slug = sub | slugify %}
-              <li class="nav-item">
-                <a href="{{ '/categories/' | append: sub_slug | append: '/' | relative_url }}" class="nav-link py-0 ps-5" style="opacity: 0.8;">
-                  <i class="fa-fw {{ dd_icons[forloop.index0] }} me-1" style="font-size: 0.7rem;"></i>
-                  <span>{{ sub }}</span>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </li>
-        <!-- Other main categories -->
-        {% assign other_categories = "Engineering,AI & ML,Startup & Investment,Career" | split: "," %}
-        {% assign other_icons = "fas fa-cogs,fas fa-brain,fas fa-chart-line,fas fa-briefcase" | split: "," %}
-        {% for cat in other_categories %}
-          {% assign cat_slug = cat | slugify %}
-          <li class="nav-item">
-            <a href="{{ '/categories/' | append: cat_slug | append: '/' | relative_url }}" class="nav-link py-1 ps-3">
-              <i class="fa-fw {{ other_icons[forloop.index0] }} me-1" style="font-size: 0.8rem;"></i>
-              <span>{{ cat }}</span>
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
+
+
   </nav>
 
   <div class="sidebar-bottom d-flex flex-wrap  align-items-center w-100">

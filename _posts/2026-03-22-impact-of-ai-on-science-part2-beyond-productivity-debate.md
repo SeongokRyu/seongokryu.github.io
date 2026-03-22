@@ -188,16 +188,13 @@ These are not merely theoretical concerns. In Part 3, we examine what the empiri
 
 ## References
 
-- Acemoglu, D. (2024). The Simple Macroeconomics of AI. *NBER Working Paper 32487*.
-- Acemoglu, D. & Johnson, S. (2023). *Power and Progress*. PublicAffairs.
-- Aghion, P. & Bunel, S. (2024). *AI and Growth*.
-- Aghion, P., Bunel, S., & Jaravel, X. (2025). AI's Optimistic Potential. *Project Syndicate*.
-- Gans, J. S. (2025). A Quest for AI Knowledge. *NBER Working Paper 33566*.
-- Gans, J. S. (2026). Growth in AI Knowledge.
+- Acemoglu, D. (2024). [The Simple Macroeconomics of AI.](https://www.nber.org/papers/w32487) *NBER Working Paper 32487*.
+- Acemoglu, D. & Johnson, S. (2023). [*Power and Progress: Our Thousand-Year Struggle Over Technology and Prosperity*.](https://shapingwork.mit.edu/power-and-progress/) PublicAffairs.
+- Aghion, P. & Bunel, S. (2024). [AI and Growth: Where Do We Stand?](https://www.frbsf.org/wp-content/uploads/AI-and-Growth-Aghion-Bunel.pdf)
+- Gans, J. S. (2025). [A Quest for AI Knowledge.](https://www.nber.org/papers/w33566) *NBER Working Paper 33566*.
+- Gans, J. S. (2026). [Growth in AI Knowledge.](https://www.nber.org/papers/w33907) *NBER Working Paper 33907*.
 - Jones, C. & Tonetti, C. (2026). Past Automation and Future AI: How Weak Links Tame the Growth Explosion.
-- Korinek, A. & Trammell, P. (2024). Economic Growth under Transformative AI. *NBER Working Paper*.
-- Korinek, A. & Suh, D. (2024). Scenarios for the Transition to AGI.
-- Levine, D. (2025). Anthropic Economic Index.
-- Tabarrok, M. Contra Acemoglu on AI.
-- Fetzer, T. Knowledge Collapse as Institutional Design Failure.
-- Carnehl, C. & Schneider, J. (2025). *Econometrica*.
+- Korinek, A. & Trammell, P. (2024). [Economic Growth under Transformative AI.](https://www.nber.org/papers/w31815) *NBER Working Paper 31815*.
+- Levine, D. (2025). [Anthropic Economic Index.](https://www.anthropic.com/news/the-anthropic-economic-index) Anthropic.
+- Tabarrok, M. (2024). [Contra Acemoglu on AI.](https://www.maximum-progress.com/p/contra-acemoglu-on-ai) *Maximum Progress*.
+- Carnehl, C. & Schneider, J. (2025). [A Quest for Knowledge.](https://onlinelibrary.wiley.com/doi/full/10.3982/ECTA22144) *Econometrica*, 93(2), 623–659.

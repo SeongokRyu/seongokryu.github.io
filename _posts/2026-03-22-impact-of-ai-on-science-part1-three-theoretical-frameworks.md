@@ -223,13 +223,10 @@ For those of us working on AI for Science, the takeaway is that optimizing for i
 
 ## References
 
-- Agrawal, A. K., McHale, J., & Oettl, A. (2026). AI in Science. *NBER Working Paper 34953*.
-- Acemoglu, D., Kong, D., & Ozdaglar, A. (2026). AI, Human Cognition and Knowledge Collapse. *NBER Working Paper 34910*.
+- Agrawal, A. K., McHale, J., & Oettl, A. (2026). [AI in Science.](https://www.nber.org/papers/w34953) *NBER Working Paper 34953*.
+- Acemoglu, D., Kong, D., & Ozdaglar, A. (2026). [AI, Human Cognition and Knowledge Collapse.](https://economics.mit.edu/sites/default/files/2026-02/AI,%20Human%20Cognition%20and%20Knowledge%20Collapse%2002-20-26.pdf) *NBER Working Paper 34910*.
 - Hong, J., Yoon, S., Park, S., & Han, S. P. How User Adoption of ChatGPT Influences Commercial Search Patterns in Traditional Search Engines. Under revision at *Management Science*.
-- Hao, Y., et al. (2025). AI and Scientific Research: Individual Productivity and Collective Scope.
-- Brynjolfsson, E., et al. (2025). Generative AI at Work.
-- del Rio-Chanona, R. M., et al. (2024). The Effect of ChatGPT on Stack Overflow.
-- Lyu, H., et al. (2025). ChatGPT as a Substitute for Wikipedia.
-- Kosmyna, N., et al. (2025). AI Writing Assistance and Cognitive Change.
-- Gerlich, M. (2025). LLMs and Creativity.
-- Mollick, E. (2024). The Jagged Frontier.
+- Hao, Y., et al. (2025). [Artificial Intelligence Tools Expand Scientists' Impact but Contract Science's Focus.](https://www.nature.com/articles/s41586-025-09922-y) *Nature*.
+- Brynjolfsson, E., Li, D., & Raymond, L. R. (2025). [Generative AI at Work.](https://www.nber.org/papers/w31161) *The Quarterly Journal of Economics*, 140(2), 889–938.
+- del Rio-Chanona, R. M., et al. (2024). [Large Language Models Reduce Public Knowledge Sharing on Online Q&A Platforms.](https://arxiv.org/abs/2307.07367) *PNAS Nexus*, 3, pgae400.
+- Dell'Acqua, F., McFowland, E., Mollick, E. R., et al. (2024). [Navigating the Jagged Technological Frontier.](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4573321) *Organization Science*.

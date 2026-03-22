@@ -193,7 +193,7 @@ These are not abstract principles — they are conditions that can be assessed e
 - Agrawal, A. K., McHale, J., & Oettl, A. (2026). [AI in Science.](https://www.nber.org/papers/w34953) *NBER Working Paper 34953*.
 - Acemoglu, D., Kong, D., & Ozdaglar, A. (2026). [AI, Human Cognition and Knowledge Collapse.](https://economics.mit.edu/sites/default/files/2026-02/AI,%20Human%20Cognition%20and%20Knowledge%20Collapse%2002-20-26.pdf) *NBER Working Paper 34910*.
 - Gans, J. S. (2025). [A Quest for AI Knowledge.](https://www.nber.org/papers/w33566) *NBER Working Paper 33566*.
-- Hong, J., Yoon, S., Park, S., & Han, S. P. How User Adoption of ChatGPT Influences Commercial Search Patterns. Under revision at *Management Science*.
+- Hong, J., Yoon, S., Park, S., & Han, S. P. [How User Adoption of ChatGPT Influences Commercial Search Patterns.](https://sites.google.com/view/juwonhong/research) Under revision at *Management Science*.
 - Hao, Y., et al. (2025). [Artificial Intelligence Tools Expand Scientists' Impact but Contract Science's Focus.](https://www.nature.com/articles/s41586-025-09922-y) *Nature*.
 - Jumper, J., et al. (2021). [Highly accurate protein structure prediction with AlphaFold.](https://www.nature.com/articles/s41586-021-03819-2) *Nature*, 596, 583–589.
 - del Rio-Chanona, R. M., et al. (2024). [Large Language Models Reduce Public Knowledge Sharing on Online Q&A Platforms.](https://arxiv.org/abs/2307.07367) *PNAS Nexus*, 3, pgae400.

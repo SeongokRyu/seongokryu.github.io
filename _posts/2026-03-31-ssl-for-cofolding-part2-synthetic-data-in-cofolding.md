@@ -54,10 +54,10 @@ The mapping to SSL terminology is immediate:
 
 | Data Layer | Scale | SSL Term | Symbol |
 |---|---|---|---|
-| **Sequences** | ~250M-2.5B | Unlabeled data | $\mathcal{D}_U$ |
-| **Synthetic structures** | ~10M-200M | Pseudo-labeled data | $\hat{\mathcal{D}}_U$ |
-| **PDB experimental** | ~220K | Labeled data | $\mathcal{D}_L$ |
-| **Functional data** | ~10K-50K | Task-specific labels | $\mathcal{D}_{\text{task}}$ |
+| **Sequences** | ~250M-2.5B | Unlabeled data | D_U |
+| **Synthetic structures** | ~10M-200M | Pseudo-labeled data | D̂_U |
+| **PDB experimental** | ~220K | Labeled data | D_L |
+| **Functional data** | ~10K-50K | Task-specific labels | D_task |
 
 In computer vision, the canonical SSL problem is: 50K labeled images from CIFAR-10, millions of unlabeled images from the web. The ratio is roughly 1:100 or 1:1000.
 
@@ -71,15 +71,19 @@ This pyramid is structurally identical to the SSL problem in computer vision. Th
 
 We now analyze six models in chronological order. For each, we characterize the distillation strategy across five dimensions and provide the SSL interpretation.
 
-Before diving in, two loss functions appear repeatedly and are worth defining once. The **Frame Aligned Point Error (FAPE)**, used in AF2, measures structural accuracy via local reference frames:
+Before diving in, two loss functions appear repeatedly and are worth defining once. The **Frame Aligned Point Error (FAPE)**, used in AF2, measures structural accuracy via local reference frames. Given rigid-body frames T_i and atom positions x_j (true) and x̂_j (predicted):
 
-$$\text{FAPE} = \frac{1}{N_{\text{frames}}} \frac{1}{N_{\text{atoms}}} \sum_{i} \sum_{j} \left\| T_i^{-1} \circ \hat{\mathbf{x}}_j - T_i^{-1} \circ \mathbf{x}_j \right\|_{\text{clamp}}$$
+$$
+\text{FAPE} = \frac{1}{N_{\text{frames}}} \frac{1}{N_{\text{atoms}}} \sum_{i} \sum_{j} \left\| T_i^{-1} \circ \hat{\mathbf{x}}_j - T_i^{-1} \circ \mathbf{x}_j \right\|_{\text{clamp}}
+$$
 
-where $T_i$ are rigid-body frames and $\mathbf{x}_j$, $\hat{\mathbf{x}}_j$ are true and predicted atom positions. The **EDM diffusion loss**, used in AF3 and all subsequent models, trains a denoiser $D_\theta$ to recover clean coordinates $\mathbf{x}_0$ from noised coordinates $\mathbf{x}_t$:
+The **EDM diffusion loss**, used in AF3 and all subsequent models, trains a denoiser D_θ to recover clean coordinates x₀ from noised coordinates x_t:
 
-$$\mathcal{L}_{\text{diffusion}} = \mathbb{E}_{t, \epsilon}\left[\lambda(t) \left\| D_\theta(\mathbf{x}_t, t) - \mathbf{x}_0 \right\|^2\right]$$
+$$
+\mathcal{L}_{\text{diffusion}} = \mathbb{E}_{t, \epsilon}\left[\lambda(t) \left\| D_\theta(\mathbf{x}_t, t) - \mathbf{x}_0 \right\|^2\right]
+$$
 
-where $\lambda(t)$ is a time-dependent weighting function and $\mathbf{x}_t = \alpha_t \mathbf{x}_0 + \sigma_t \epsilon$ with $\epsilon \sim \mathcal{N}(0, I)$.
+where λ(t) is a time-dependent weighting function. The noised coordinates are defined as x_t = α_t · x₀ + σ_t · ε with ε ~ N(0, I).
 
 ### 2.1 AlphaFold2: The First Self-Distillation
 
@@ -91,13 +95,15 @@ AlphaFold2 introduced self-distillation to protein structure prediction. In SSL 
 
 **Student.** Identical architecture (Evoformer + IPA Structure Module). Initialized from scratch — no weight transfer from the teacher. This is pure data-level knowledge transfer.
 
-**Data.** Starting from 6.3M sequences in Uniclust30 (v2018-08), the pipeline applied greedy deduplication, length filtering (200 < length $\leq$ 1024), and MSA depth filtering ($\geq$ 200 sequences). The result: **355,993 synthetic structures**. MSA for each distillation example was subsampled to 1,000 sequences.
+**Data.** Starting from 6.3M sequences in Uniclust30 (v2018-08), the pipeline applied greedy deduplication, length filtering (200 < length ≤ 1024), and MSA depth filtering (≥ 200 sequences). The result: **355,993 synthetic structures**. MSA for each distillation example was subsampled to 1,000 sequences.
 
 **Filtering.** AF2's confidence filtering is finer-grained than anything in CV SSL. Rather than accepting or rejecting entire samples, AF2 uses a per-residue KL-divergence metric:
 
-$$c_i = \frac{1}{|\mathcal{N}_i|} \sum_{j \in \mathcal{N}_i} D_{\text{KL}}\left(p_{\text{ref},|i-j|}(r) \;\|\; p_{i,j}(r)\right)$$
+$$
+c_i = \frac{1}{|\mathcal{N}_i|} \sum_{j \in \mathcal{N}_i} D_{\text{KL}}\left(p_{\text{ref},|i-j|}(r) \;\|\; p_{i,j}(r)\right)
+$$
 
-where $p_{i,j}(r)$ is the predicted pairwise distance distribution between residues $i$ and $j$, $p_{\text{ref},|i-j|}(r)$ is the reference distribution computed from 1,000 random Uniclust30 sequences, and $\mathcal{N}_i$ is the set of residues within $\pm 128$ positions of $i$. Notably, this is **not** pLDDT — it is a distance-distribution-based confidence score. Residues with $c_i < 0.5$ are masked from the loss, meaning the student never trains on low-confidence regions.
+Here p_i,j(r) is the predicted pairwise distance distribution between residues i and j, and p_ref is the reference distribution computed from 1,000 random Uniclust30 sequences. The neighborhood N_i covers residues within ±128 positions of i. Notably, this is **not** pLDDT — it is a distance-distribution-based confidence score. Residues with c_i < 0.5 are masked from the loss, meaning the student never trains on low-confidence regions.
 
 **Loss.** The same loss as for experimental data: FAPE + distogram + masked MSA + auxiliary losses. The only difference is the per-residue confidence masking described above. FAPE clamping (10 angstrom) is applied identically to PDB and distillation data.
 
@@ -148,13 +154,15 @@ This is genuine cross-architecture distillation — knowledge transfer between f
 
 Note the extreme downweighting of short monomers (0.005 for 28M sequences vs. 0.495 for 13M longer ones). This is implicit quality control through sampling — short proteins are easier to predict but less informative for training.
 
-**Filtering.** AF3 made a surprising decision: it **removed** the pLDDT $\geq$ 0.8 threshold that AF2 had applied to monomer distillation. Instead of filtering at the data level, AF3 manages quality through loss differentiation and sampling weights. For RNA, a stricter filter applies: average PDE (Predicted Distance Error) $< 2$ angstrom.
+**Filtering.** AF3 made a surprising decision: it **removed** the pLDDT ≥ 0.8 threshold that AF2 had applied to monomer distillation. Instead of filtering at the data level, AF3 manages quality through loss differentiation and sampling weights. For RNA, a stricter filter applies: average PDE (Predicted Distance Error) < 2 angstrom.
 
 **Loss.** This is the most critical design decision — and the one with the strongest SSL implications:
 
-$$\mathcal{L} = \underbrace{\alpha_{\text{diff}} \mathcal{L}_{\text{diffusion}} + \alpha_{\text{dist}} \mathcal{L}_{\text{distogram}}}_{\text{applied to all data}} + \underbrace{\alpha_{\text{conf}} \left(\mathcal{L}_{\text{pLDDT}} + \mathcal{L}_{\text{PDE}} + \alpha_{\text{PAE}} \mathcal{L}_{\text{PAE}}\right)}_{\text{applied to PDB only}}$$
+$$
+\mathcal{L} = \underbrace{\alpha_{\text{diff}} \mathcal{L}_{\text{diffusion}} + \alpha_{\text{dist}} \mathcal{L}_{\text{distogram}}}_{\text{applied to all data}} + \underbrace{\alpha_{\text{conf}} \left(\mathcal{L}_{\text{pLDDT}} + \mathcal{L}_{\text{PDE}} + \alpha_{\text{PAE}} \mathcal{L}_{\text{PAE}}\right)}_{\text{applied to PDB only}}
+$$
 
-where $\alpha_{\text{diff}} = 4$, $\alpha_{\text{dist}} = 3 \times 10^{-2}$, and $\alpha_{\text{conf}} = 10^{-4}$.
+with coefficients α_diff = 4, α_dist = 3 × 10⁻², and α_conf = 10⁻⁴.
 
 The structural losses (diffusion denoising, distogram prediction) are applied to all data — PDB and synthetic alike. But the confidence losses (pLDDT, PDE, PAE) are applied **exclusively to PDB experimental data**. The reasoning: structural pseudo-labels from a good teacher are approximately correct and useful for training; but confidence pseudo-labels — which require knowing the true error — would propagate the teacher's calibration errors into the student. We will return to this asymmetry in Part 3.
 
@@ -224,14 +232,14 @@ The use of their own previous model (Boltz-1) as the complex teacher is a form o
 
 **Filtering.** Boltz-2 applies different thresholds to different data types:
 
-- AFDB monomers: global lDDT $\geq$ 0.5 — a notably **low** threshold compared to SeedFold's pLDDT $\geq$ 0.8
-- Boltz-1 complexes: iPDE $\leq$ 1.0, PDE $\leq$ 1.0, ipTM $\geq$ 0.85 — **strict** for interface quality
+- AFDB monomers: global lDDT ≥ 0.5 — a notably **low** threshold compared to SeedFold's pLDDT ≥ 0.8
+- Boltz-1 complexes: iPDE ≤ 1.0, PDE ≤ 1.0, ipTM ≥ 0.85 — **strict** for interface quality
 
 This asymmetry is interesting: Boltz-2 accepts low-confidence monomers (more data, more noise) but demands high-confidence complex predictions (less data, less noise). The implicit assumption is that monomer errors are tolerable but interface errors are not.
 
 **Loss.** Same loss for all data sources — quality is managed entirely through sampling ratios, not through loss differentiation. No confidence loss separation as in AF3.
 
-**SSL interpretation.** Fixed thresholds plus data-agnostic loss. Multi-teacher but without loss separation. In CV terms, this is closer to standard pseudo-labeling with hard thresholding than to the more nuanced FixMatch family. The lDDT $\geq$ 0.5 threshold is equivalent to setting FixMatch's $\tau$ very low — including many uncertain predictions in training.
+**SSL interpretation.** Fixed thresholds plus data-agnostic loss. Multi-teacher but without loss separation. In CV terms, this is closer to standard pseudo-labeling with hard thresholding than to the more nuanced FixMatch family. The lDDT ≥ 0.5 threshold is equivalent to setting FixMatch's $\tau$ very low — including many uncertain predictions in training.
 
 ---
 
@@ -239,7 +247,7 @@ This asymmetry is interesting: Boltz-2 accepts low-confidence monomers (more dat
 
 *SeedFold team, "SeedFold: Scaling Biomolecular Structure Prediction," arXiv 2025*
 
-SeedFold holds the record for the largest distillation dataset: 26.5M structures, a 147$\times$ expansion over PDB alone.
+SeedFold holds the record for the largest distillation dataset: 26.5M structures, a 147× expansion over PDB alone.
 
 **Teacher.** OpenFold running AlphaFold2 weights. The team chose AF2 over AF3 as the teacher — prioritizing inference speed and the well-established reliability of AF2 monomer predictions over AF3's broader but newer capabilities.
 
@@ -256,7 +264,7 @@ SeedFold holds the record for the largest distillation dataset: 26.5M structures
 
 The MGnify component is distinctive. These 23M sequences come from metagenomic sources — uncultured organisms from soil, ocean, and gut microbiomes. Only 2M of the 23M sequences map to existing AFDB clusters, meaning the vast majority represent novel structural diversity absent from the PDB and conventional protein databases. This is the protein AI equivalent of mining the web for unlabeled images.
 
-**Filtering.** pLDDT $\geq$ 0.8 for AFDB structures, 30-50% sequence identity clustering to ensure structural diversity.
+**Filtering.** pLDDT ≥ 0.8 for AFDB structures, 30-50% sequence identity clustering to ensure structural diversity.
 
 **Loss.** Same loss for distilled and experimental data — no differentiation. Quality managed by 50:50 sampling weight and additional per-cluster, per-molecule-type weighting.
 
@@ -264,7 +272,9 @@ The MGnify component is distinctive. These 23M sequences come from metagenomic s
 
 The architectural transition from AF2's IPA (Invariant Point Attention) to AF3-style diffusion transformers removed strong geometric inductive biases. IPA is SE(3)-equivariant by construction — it "knows" about 3D geometry through its design. The diffusion transformer has no such built-in geometric knowledge and must learn spatial relationships entirely from data. With only 180K PDB structures, there is not enough data to learn these relationships. The 26.5M distillation set compensates for the lost inductive bias with data volume. In equation form:
 
-$$\underbrace{\text{IPA (strong geometric prior)}}_{\text{needs less data}} \quad \longrightarrow \quad \underbrace{\text{Diffusion Transformer (weak prior)}}_{\text{needs } \gg \text{ data}}$$
+$$
+\underbrace{\text{IPA (strong geometric prior)}}_{\text{needs less data}} \quad \longrightarrow \quad \underbrace{\text{Diffusion Transformer (weak prior)}}_{\text{needs } \gg \text{ data}}
+$$
 
 This is an architectural argument for why distillation is even more critical for post-AF2 models than it was for AF2 itself.
 
@@ -292,7 +302,7 @@ OpenFold3 is the open-source reproduction of AF3's training protocol, and the mo
 
 97% of OpenFold3's training data is synthetic. This is the most extreme pseudo-label-to-labeled ratio in the field — far exceeding what is typical in CV SSL, where labeled data usually constitutes at least 10-20% of the training mix.
 
-**Filtering.** Monomer: MGnify cluster size $\geq$ 10 (statistical sufficiency, not confidence-based). RNA: Rfam cluster representatives, AF3 predictions with average PDE $< 2$.
+**Filtering.** Monomer: MGnify cluster size ≥ 10 (statistical sufficiency, not confidence-based). RNA: Rfam cluster representatives, AF3 predictions with average PDE < 2.
 
 **Loss.** Follows AF3's protocol: confidence losses (pLDDT, PDE, PAE) applied to PDB only. This is the key design decision that AF3 pioneered and OpenFold3 inherited.
 
@@ -310,25 +320,25 @@ Having analyzed each model individually, we now compare them across multiple dim
 
 | Model | Teacher(s) | Student Arch | Distill Scale | PDB:Distill Ratio | Confidence Filter | Loss Differentiation | Continuous Distill |
 |---|---|---|---|---|---|---|---|
-| **AF2** | Undistilled AF2 | Same (Evoformer+IPA) | 356K | 25:75 | KL-div $c_i < 0.5$ | Residue masking only | Yes |
+| **AF2** | Undistilled AF2 | Same (Evoformer+IPA) | 356K | 25:75 | KL-div c_i < 0.5 | Residue masking only | Yes |
 | **AF3** | AF2 + AFM v2.3 + AF3 | Different (Pairformer+Diffusion) | ~41M+ | ~50:50 | None (monomer), PDE<2 (RNA) | Conf. loss PDB only | Yes |
-| **Boltz-1** | AF2 (OpenFold) | Pairformer+Diffusion | 270K | 50:50 $\to$ PDB only | OpenFold defaults | None | No (removed last 15K) |
-| **Boltz-2** | AF2 + Boltz-1 | Pairformer+Diffusion | ~5M+ | 60:40 | lDDT$\geq$0.5, ipTM$\geq$0.85 | None | Yes |
-| **SeedFold** | AF2 (OpenFold) | Pairformer+Diffusion | 26.5M | 50:50 | pLDDT$\geq$0.8 | None | Yes (ablation proven) |
-| **OpenFold3** | AF2 + AF3 | Pairformer+Diffusion | ~13M | 3:97 | Cluster$\geq$10, PDE<2 | Conf. loss PDB only | Yes |
+| **Boltz-1** | AF2 (OpenFold) | Pairformer+Diffusion | 270K | 50:50 → PDB only | OpenFold defaults | None | No (removed last 15K) |
+| **Boltz-2** | AF2 + Boltz-1 | Pairformer+Diffusion | ~5M+ | 60:40 | lDDT≥0.5, ipTM≥0.85 | None | Yes |
+| **SeedFold** | AF2 (OpenFold) | Pairformer+Diffusion | 26.5M | 50:50 | pLDDT≥0.8 | None | Yes (ablation proven) |
+| **OpenFold3** | AF2 + AF3 | Pairformer+Diffusion | ~13M | 3:97 | Cluster≥10, PDE<2 | Conf. loss PDB only | Yes |
 
 ### 3.2 Confidence Filtering Comparison
 
 | Model | Metric | Threshold | Granularity | Notes |
 |---|---|---|---|---|
-| AF2 | KL-divergence $c_i$ | 0.5 | **Residue-level** | Masks individual residues in loss |
-| AF3 (monomer) | None | Removed | N/A | Dropped AF2's pLDDT$\geq$0.8 filter |
-| AF3 (RNA) | PDE | $< 2$ | Sample-level | Applied only to RNA distillation |
-| Boltz-2 (monomer) | lDDT | $\geq 0.5$ | Sample-level | Notably low threshold |
-| Boltz-2 (complex) | ipTM | $\geq 0.85$ | Sample-level | Strict for interfaces |
-| SeedFold | pLDDT | $\geq 0.8$ | Sample-level | Standard threshold |
-| OpenFold3 (monomer) | Cluster size | $\geq 10$ | Cluster-level | Statistical, not confidence-based |
-| OpenFold3 (RNA) | PDE | $< 2$ | Sample-level | Follows AF3 protocol |
+| AF2 | KL-divergence c_i | 0.5 | **Residue-level** | Masks individual residues in loss |
+| AF3 (monomer) | None | Removed | N/A | Dropped AF2's pLDDT ≥ 0.8 filter |
+| AF3 (RNA) | PDE | < 2 | Sample-level | Applied only to RNA distillation |
+| Boltz-2 (monomer) | lDDT | ≥ 0.5 | Sample-level | Notably low threshold |
+| Boltz-2 (complex) | ipTM | ≥ 0.85 | Sample-level | Strict for interfaces |
+| SeedFold | pLDDT | ≥ 0.8 | Sample-level | Standard threshold |
+| OpenFold3 (monomer) | Cluster size | ≥ 10 | Cluster-level | Statistical, not confidence-based |
+| OpenFold3 (RNA) | PDE | < 2 | Sample-level | Follows AF3 protocol |
 
 **Key observation:** Every model uses **fixed thresholds with hard filtering**. No model employs adaptive thresholding (FlexMatch), soft weighting (SoftMatch), or learned quality predictors (SemiReward). The most sophisticated filtering is AF2's per-residue masking — ironically the oldest approach in the field.
 
@@ -387,7 +397,7 @@ The exponential growth in synthetic data is one of the most striking trends:
   AF3 (2024)     ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  ~41M+
 ```
 
-From 356K to 41M+ in four years — a 115$\times$ increase. The PDB, meanwhile, grew from ~180K to ~220K in the same period. Synthetic data is not just supplementing PDB; it is dominating training by two orders of magnitude.
+From 356K to 41M+ in four years — a 115× increase. The PDB, meanwhile, grew from ~180K to ~220K in the same period. Synthetic data is not just supplementing PDB; it is dominating training by two orders of magnitude.
 
 ### 3.6 Distillation Continuity Comparison
 
@@ -412,7 +422,7 @@ Having mapped each model's distillation strategy to SSL terminology, we can now 
 | **Pseudo-labeling** | Lee, 2013 | Self-distillation (all models) | Full |
 | **Teacher-student framework** | Hinton et al., 2015 | Teacher generates structures, student trains on them | Full |
 | **Fixed confidence threshold** | FixMatch (Sohn et al., 2020) | pLDDT/ipTM/KL-div thresholds | Full |
-| **Cross-architecture distillation** | Knowledge distillation | AF2 $\to$ AF3, AF2 $\to$ Boltz | Full |
+| **Cross-architecture distillation** | Knowledge distillation | AF2 → AF3, AF2 → Boltz | Full |
 | **Multi-source data mixing** | — | AF3, Boltz-2 multi-teacher | Partial |
 | **Loss-type separation** | — | AF3 confidence loss on PDB only | Partial (AF3/OF3 only) |
 | **Iterative self-training (1 round)** | Noisy Student (Xie et al., 2020) | Student becomes next generation's teacher | Implicit |
@@ -421,13 +431,17 @@ Having mapped each model's distillation strategy to SSL terminology, we can now 
 
 The mapping is precise enough to write in equation form. In CV SSL, the standard self-training loss is:
 
-$$\mathcal{L} = \frac{1}{|\mathcal{D}_L|} \sum_{(x,y) \in \mathcal{D}_L} \ell(f_\theta(x), y) \;+\; \lambda \frac{1}{|\hat{\mathcal{D}}_U|} \sum_{(x,\hat{y}) \in \hat{\mathcal{D}}_U} \mathbb{1}[\text{conf}(\hat{y}) \geq \tau] \cdot \ell(f_\theta(x), \hat{y})$$
+$$
+\mathcal{L} = \frac{1}{|\mathcal{D}_L|} \sum_{(x,y) \in \mathcal{D}_L} \ell(f_\theta(x), y) \;+\; \lambda \frac{1}{|\hat{\mathcal{D}}_U|} \sum_{(x,\hat{y}) \in \hat{\mathcal{D}}_U} \mathbb{1}[\text{conf}(\hat{y}) \geq \tau] \cdot \ell(f_\theta(x), \hat{y})
+$$
 
 In protein AI, the corresponding formulation is:
 
-$$\mathcal{L} = \underbrace{\sum_{s \in \mathcal{D}_{\text{PDB}}} w_s \cdot \mathcal{L}_{\text{struct+conf}}(s)}_{\text{labeled (PDB)}} \;+\; \underbrace{\sum_{s \in \hat{\mathcal{D}}_{\text{synth}}} w_s \cdot \mathcal{L}_{\text{struct}}(s)}_{\text{pseudo-labeled (synthetic)}}$$
+$$
+\mathcal{L} = \underbrace{\sum_{s \in \mathcal{D}_{\text{PDB}}} w_s \cdot \mathcal{L}_{\text{struct+conf}}(s)}_{\text{labeled (PDB)}} \;+\; \underbrace{\sum_{s \in \hat{\mathcal{D}}_{\text{synth}}} w_s \cdot \mathcal{L}_{\text{struct}}(s)}_{\text{pseudo-labeled (synthetic)}}
+$$
 
-where $w_s$ encodes the sampling weight, $\mathcal{L}_{\text{struct}}$ includes diffusion and distogram losses, and $\mathcal{L}_{\text{conf}}$ includes pLDDT, PDE, and PAE losses. The confidence filtering enters through data preprocessing (hard threshold on $\hat{\mathcal{D}}_{\text{synth}}$) rather than through the loss itself.
+Here w_s encodes the sampling weight. The term L_struct includes diffusion and distogram losses, while L_conf includes pLDDT, PDE, and PAE losses. The confidence filtering enters through data preprocessing (hard threshold on the synthetic dataset) rather than through the loss itself.
 
 ### 4.3 The Adoption Timeline
 
@@ -489,7 +503,7 @@ The analysis above reveals a striking asymmetry. On one hand, every major co-fol
 
 The gaps fall into five categories:
 
-- **Adaptive thresholding.** Every model uses a fixed confidence threshold (pLDDT $\geq$ 0.8, lDDT $\geq$ 0.5, etc.). FlexMatch (Zhang et al., 2021, NeurIPS) and FreeMatch (Wang et al., 2023, ICLR) showed that adaptive, class-specific thresholds dramatically improve SSL in CV. In protein terms, this would mean different thresholds for alpha-helical domains vs. disordered loops vs. protein-protein interfaces — regions where teacher confidence is calibrated very differently.
+- **Adaptive thresholding.** Every model uses a fixed confidence threshold (pLDDT ≥ 0.8, lDDT ≥ 0.5, etc.). FlexMatch (Zhang et al., 2021, NeurIPS) and FreeMatch (Wang et al., 2023, ICLR) showed that adaptive, class-specific thresholds dramatically improve SSL in CV. In protein terms, this would mean different thresholds for alpha-helical domains vs. disordered loops vs. protein-protein interfaces — regions where teacher confidence is calibrated very differently.
 
 - **Soft weighting.** All models apply binary hard filtering: a prediction is either in or out based on whether it exceeds the threshold. SoftMatch (Chen et al., 2023, ICLR) replaced this binary gate with a continuous Gaussian weight. In protein terms, a prediction with pLDDT 0.79 is currently discarded entirely (if the threshold is 0.8), while a prediction with pLDDT 0.81 gets full weight. A soft weighting scheme would make this boundary continuous.
 

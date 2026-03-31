@@ -82,7 +82,8 @@ A different angle: **the model's prediction should not change when we perturb th
 
 $$\mathcal{L}_{\text{cons}} = \| p_\theta(y \mid \alpha_1(x)) - p_\theta(y \mid \alpha_2(x)) \|^2$$
 
-where $\alpha_1(x)$ and $\alpha_2(x)$ are two different augmentations of the same input. No labels are needed — we are only asking the model to be self-consistent.
+where $\alpha_{1}(x)$ and $\alpha_{2}(x)$ are two different augmentations of the same input.
+No labels are needed — we are only asking the model to be self-consistent.
 
 **Intuition**: This acts as a smoothness regularizer. The model learns that the function $p_\theta(y \mid x)$ should be locally flat — small perturbations in input space should not cross decision boundaries. This is closely related to the cluster assumption in SSL: data points in the same cluster should share labels, and clusters should be separated by low-density regions.
 
@@ -135,7 +136,7 @@ Pseudo-labeling implicitly performs entropy minimization (hard labels have zero 
 | Principle | Core Equation | Intuition | Representative Method |
 |---|---|---|---|
 | **Pseudo-labeling** | $\hat{y} = \arg\max_c \; p_\theta(c \mid x)$ | Trust confident model predictions as ground truth | Pseudo-Label (Lee, 2013) |
-| **Consistency regularization** | $\lVert p_\theta(\alpha_1(x)) - p_\theta(\alpha_2(x)) \rVert^2$ | Same input, different view, same prediction | Mean Teacher (Tarvainen & Valpola, 2017) |
+| **Consistency regularization** | ‖p(α₁(x)) − p(α₂(x))‖² | Same input, different view, same prediction | Mean Teacher (Tarvainen & Valpola, 2017) |
 | **Entropy minimization** | $-\sum_c p_\theta(c \mid x) \log p_\theta(c \mid x)$ | Force the model to commit to one class | Minimum Entropy (Grandvalet & Bengio, 2005) |
 
 ---
@@ -175,7 +176,8 @@ The second era established consistency regularization as the dominant paradigm a
 
 $$\theta'_t = \alpha \theta'_{t-1} + (1 - \alpha) \theta_t$$
 
-where $\theta_t$ is the student's weights at step $t$, $\theta'_t$ is the teacher's weights (the EMA), and $\alpha$ is a momentum coefficient (typically 0.999). The student is trained on both labeled data and a consistency loss against the teacher's predictions. The teacher never receives gradient updates — it evolves only through the EMA.
+Here $\theta_{t}$ is the student's weights at step $t$ and $\theta'_{t}$ is the teacher's weights (the EMA).
+The momentum coefficient $\alpha$ is typically 0.999. The student is trained on both labeled data and a consistency loss against the teacher's predictions. The teacher never receives gradient updates — it evolves only through the EMA.
 
 Why does this work better than Temporal Ensembling? The teacher provides a consistency target that updates every training step (not every epoch), scales to large datasets without per-sample memory, and produces smoother, more reliable targets because weight averaging is more stable than prediction averaging.
 
@@ -304,7 +306,8 @@ The threshold tracks the model's evolving competence — low early in training w
 
 $$w(x) = \exp\left(-\frac{(\max p_\theta(x) - \mu_t)^2}{2\sigma_t^2}\right) \cdot \mathbb{1}[\max p_\theta(x) \geq \tau_{\min}]$$
 
-Here $\mu_t$ and $\sigma_t$ are the EMA mean and standard deviation of model confidence at step $t$, and $\tau_{\min}$ is a minimal quality floor. The Gaussian weighting means: samples near the current learning frontier (confidence close to $\mu_t$) get the highest weight, while very easy samples (already learned) and very hard ones (probably wrong) are downweighted. This is a truncated Gaussian sample reweighting scheme that naturally implements curriculum learning.
+Here $\mu_{t}$ and $\sigma_{t}$ are the EMA mean and standard deviation of model confidence at step $t$, and $\tau_{\min}$ is a minimal quality floor.
+The Gaussian weighting means: samples near the current learning frontier (confidence close to $\mu_{t}$) get the highest weight, while very easy samples (already learned) and very hard ones (probably wrong) are downweighted. This is a truncated Gaussian sample reweighting scheme that naturally implements curriculum learning.
 
 **SemiReward (Wang et al., 2024, ICLR).** A fundamentally different approach: instead of using the model's own confidence to judge pseudo-label quality, **train a separate reward model** to predict whether a pseudo-label is correct. The reward model is trained on labeled data to predict whether a pseudo-label matches the true label, then applied to unlabeled data. This decouples quality estimation from the prediction model itself — addressing the circular dependency of "the model judging its own work." The idea has a natural analog in protein AI: instead of relying on pLDDT (the model's self-assessed confidence), one could train an independent quality predictor on PDB data to evaluate predicted structures. We will explore this in detail in Part 3.
 

@@ -71,7 +71,7 @@ Protein structure prediction has a rich set of input perturbation axes that map 
 | MSA depth | Full MSA (all sequences) | Subsampled (50% or fewer) |
 | Sequence coverage | Full-length sequence | Random crop (256-384 residues) |
 | Template | Template provided | Template dropout |
-| Coordinate noise | No noise injection | Gaussian noise ($\sigma = 0.5$-$1.0$ A) |
+| Coordinate noise | No noise injection | Gaussian noise (σ = 0.5–1.0 Å) |
 | Recycling iterations | Full recycling (3 rounds) | Reduced recycling (1 round) |
 
 Each axis controls a different aspect of input quality. MSA depth determines the richness of evolutionary signal. Sequence cropping removes global context. Template dropout eliminates explicit structural priors. Coordinate noise perturbs the diffusion denoiser's starting point. Recycling iterations control iterative refinement depth.
@@ -94,9 +94,11 @@ Student training (strong path):
 
 The consistency loss under this weak-to-strong regime takes the form:
 
-$$\mathcal{L}_{\text{ws}} = \text{FAPE}\left(D_\theta(\mathbf{x}_t, t;\; z_{\text{strong}}),\; \hat{\mathbf{x}}_0^{\text{weak}}\right)$$
+$$
+\mathcal{L}_{\text{ws}} = \text{FAPE}\left(D_\theta(\mathbf{x}_t, t;\; z_{\text{strong}}),\; \hat{\mathbf{x}}_0^{\text{weak}}\right)
+$$
 
-where $\hat{\mathbf{x}}_0^{\text{weak}}$ is the teacher's denoised prediction under weak augmentation, $z_{\text{strong}}$ is the pair representation derived from the strongly augmented input, $D_\theta$ is the student's denoiser, and $\mathbf{x}_t$ denotes the noised coordinates at diffusion timestep $t$.
+Here x̂₀^weak is the teacher's denoised prediction under weak augmentation and z_strong is the pair representation derived from the strongly augmented input. The student's denoiser is D_θ and x_t denotes the noised coordinates at diffusion timestep t.
 
 ### Expected Impact
 
@@ -122,9 +124,9 @@ MSA subsampling and cropping are already part of standard training pipelines. Th
 
 ### The Current Problem
 
-Every co-folding model uses a fixed confidence threshold to filter pseudo-labeled data. SeedFold requires pLDDT $\geq$ 0.8. Boltz-2 uses lDDT $\geq$ 0.5 for monomers and ipTM $\geq$ 0.85 for complexes. These thresholds are set once and never change during training.
+Every co-folding model uses a fixed confidence threshold to filter pseudo-labeled data. SeedFold requires pLDDT ≥ 0.8. Boltz-2 uses lDDT ≥ 0.5 for monomers and ipTM ≥ 0.85 for complexes. These thresholds are set once and never change during training.
 
-The consequence is severe data waste. When AF3 removed the pLDDT $>$ 0.8 filter that AF2 applied, they implicitly acknowledged the problem: strict thresholds discard too much useful data. For quaternary structure predictions in the AlphaFold Database, approximately 93% of entries would fail a pLDDT $\geq$ 0.8 cutoff. This means the vast majority of complex-structure pseudo-labels — the ones we need most — are thrown away.
+The consequence is severe data waste. When AF3 removed the pLDDT > 0.8 filter that AF2 applied, they implicitly acknowledged the problem: strict thresholds discard too much useful data. For quaternary structure predictions in the AlphaFold Database, approximately 93% of entries would fail a pLDDT ≥ 0.8 cutoff. This means the vast majority of complex-structure pseudo-labels — the ones we need most — are thrown away.
 
 Fixed thresholds also create a bias toward easy structure types. Alpha-helical domains tend to have high pLDDT; disordered regions and novel folds have low pLDDT. A single threshold enriches the training set with structures the model already handles well, while excluding precisely the difficult cases it needs to learn from.
 
@@ -132,11 +134,13 @@ Fixed thresholds also create a bias toward easy structure types. Alpha-helical d
 
 FlexMatch (Zhang et al., 2021, NeurIPS) addressed an analogous problem in CV classification: fixed thresholds cause easy classes to dominate pseudo-label selection while hard classes are systematically excluded. The solution was to maintain a per-class threshold that adapts based on learning progress.
 
-Translated to protein structure prediction, we define structure type $c$ (e.g., $\alpha$-helix domain, $\beta$-sheet domain, loop region, protein-protein interface, protein-ligand interface) and track the model's learning progress $\sigma_c(t)$ for each type. The adaptive threshold becomes:
+Translated to protein structure prediction, we define structure type c (e.g., α-helix domain, β-sheet domain, loop region, protein-protein interface, protein-ligand interface) and track the model's learning progress σ_c(t) for each type. The adaptive threshold becomes:
 
-$$\tau_c(t) = \frac{\sigma_c(t)}{\max_{c'} \sigma_{c'}(t)} \cdot \tau$$
+$$
+\tau_c(t) = \frac{\sigma_c(t)}{\max_{c'} \sigma_{c'}(t)} \cdot \tau
+$$
 
-where $\tau$ is a global base threshold and $\sigma_c(t)$ measures how well the model currently handles type $c$ — for instance, the fraction of type-$c$ predictions that exceed a validation accuracy criterion. When the model struggles with protein-protein interfaces ($\sigma_{\text{interface}}$ is low), the threshold for including interface pseudo-labels drops, allowing more of them into training.
+where τ is a global base threshold and σ_c(t) measures how well the model currently handles type c — for instance, the fraction of type-c predictions that exceed a validation accuracy criterion. When the model struggles with protein-protein interfaces (σ_interface is low), the threshold for including interface pseudo-labels drops, allowing more of them into training.
 
 ### SoftMatch: Continuous Weighting
 
@@ -144,9 +148,11 @@ SoftMatch (Chen et al., 2023, ICLR) went further: instead of any threshold at al
 
 Applied to protein AI, this means replacing the binary include/exclude decision with a smooth weight:
 
-$$w_i = \exp\left(-\frac{(\text{pLDDT}_i - \mu_t)^2}{2\sigma_t^2}\right) \cdot \mathbb{1}[\text{pLDDT}_i \geq \tau_{\min}]$$
+$$
+w_i = \exp\left(-\frac{(\text{pLDDT}_i - \mu_t)^2}{2\sigma_t^2}\right) \cdot \mathbb{1}[\text{pLDDT}_i \geq \tau_{\min}]
+$$
 
-where $\mu_t$ and $\sigma_t$ are exponential moving averages of the model's confidence distribution during training, and $\tau_{\min}$ is a minimal quality floor (e.g., 0.4) to exclude clearly unreliable predictions. The key insight: a structure with pLDDT 0.77 — currently discarded under a 0.8 threshold — would receive a partial weight (say, $w \approx 0.5$) rather than being thrown away entirely.
+Here μ_t and σ_t are exponential moving averages of the model's confidence distribution during training, and τ_min is a minimal quality floor (e.g., 0.4) to exclude clearly unreliable predictions. The key insight: a structure with pLDDT 0.77 — currently discarded under a 0.8 threshold — would receive a partial weight (say, w ≈ 0.5) rather than being thrown away entirely.
 
 ### Comparison of Threshold Strategies
 
@@ -179,9 +185,11 @@ Threshold Strategy Evolution:
 
 In practice, the most pragmatic approach may be a hybrid: soft weighting within each structure type, with type-specific parameters. The combined loss for pseudo-labeled data becomes:
 
-$$\mathcal{L}_{\text{soft}} = \sum_{i \in \hat{\mathcal{D}}_U} w_c(\text{pLDDT}_i) \cdot \mathcal{L}_i$$
+$$
+\mathcal{L}_{\text{soft}} = \sum_{i \in \hat{\mathcal{D}}_U} w_c(\text{pLDDT}_i) \cdot \mathcal{L}_i
+$$
 
-where $w_c$ is the SoftMatch weight function with parameters $(\mu_{c,t}, \sigma_{c,t})$ specific to structure type $c$. This captures both the FlexMatch insight (different types need different treatment) and the SoftMatch insight (continuous weights beat binary decisions).
+where w_c is the SoftMatch weight function with parameters (μ_c,t, σ_c,t) specific to structure type c. This captures both the FlexMatch insight (different types need different treatment) and the SoftMatch insight (continuous weights beat binary decisions).
 
 ### Implementation Difficulty: LOW to MODERATE
 
@@ -201,13 +209,17 @@ Mean Teacher (Tarvainen and Valpola, 2017, NIPS) proposed maintaining an exponen
 
 For co-folding, the online EMA teacher update rule is:
 
-$$\theta'_t = \alpha \theta'_{t-1} + (1-\alpha)\theta_t, \quad \alpha \in [0.999, 0.9999]$$
+$$
+\theta'_t = \alpha \theta'_{t-1} + (1-\alpha)\theta_t, \quad \alpha \in [0.999, 0.9999]
+$$
 
 The consistency loss between the student and its EMA teacher becomes:
 
-$$\mathcal{L}_{\text{MT}} = \text{FAPE}\left(D_{\theta}(\mathbf{x}_t, t;\; z_{\text{strong}}),\; D_{\theta'}(\mathbf{x}_t, t;\; z_{\text{weak}})\right)$$
+$$
+\mathcal{L}_{\text{MT}} = \text{FAPE}\left(D_{\theta}(\mathbf{x}_t, t;\; z_{\text{strong}}),\; D_{\theta'}(\mathbf{x}_t, t;\; z_{\text{weak}})\right)
+$$
 
-where $D_\theta$ is the student denoiser operating on strongly augmented input and $D_{\theta'}$ is the EMA teacher denoiser operating on weakly augmented input. Note that this naturally combines with the weak-to-strong augmentation from Opportunity 1.
+where D_θ is the student denoiser operating on strongly augmented input and D_θ' is the EMA teacher denoiser operating on weakly augmented input. Note that this naturally combines with the weak-to-strong augmentation from Opportunity 1.
 
 ### Offline Distillation vs Online Mean Teacher
 
@@ -270,13 +282,15 @@ Among the models that do not separate confidence loss by data source (i.e., ever
 
 Use pLDDT directly as a continuous loss weight for pseudo-labeled samples:
 
-$$\mathcal{L}_{\text{cw}} = \sum_{i \in \mathcal{D}_L} \mathcal{L}_i + \lambda \sum_{i \in \hat{\mathcal{D}}_U} w(\text{pLDDT}_i) \cdot \mathcal{L}_i$$
+$$
+\mathcal{L}_{\text{cw}} = \sum_{i \in \mathcal{D}_L} \mathcal{L}_i + \lambda \sum_{i \in \hat{\mathcal{D}}_U} w(\text{pLDDT}_i) \cdot \mathcal{L}_i
+$$
 
-where $\mathcal{D}_L$ is the labeled PDB data (full weight), $\hat{\mathcal{D}}_U$ is the pseudo-labeled synthetic data, and $w(\text{pLDDT})$ is a monotonically increasing weight function. The labeled data always receives full weight; the synthetic data is downweighted according to the teacher's confidence.
+Here D_L is the labeled PDB data (full weight) and D̂_U is the pseudo-labeled synthetic data. The function w(pLDDT) is monotonically increasing. The labeled data always receives full weight; the synthetic data is downweighted according to the teacher's confidence.
 
-The weight function $w$ could take several forms:
+The weight function w could take several forms:
 
-| pLDDT | Linear | Sigmoid | Gaussian ($\mu=0.9, \sigma=0.15$) |
+| pLDDT | Linear | Sigmoid | Gaussian (μ=0.9, σ=0.15) |
 |---|---|---|---|
 | 0.95 | 0.95 | ~1.0 | ~0.95 |
 | 0.85 | 0.85 | ~0.9 | ~0.95 |
@@ -300,7 +314,9 @@ This section addresses what we believe is the most important and under-discussed
 
 AlphaFold3's total loss decomposes as:
 
-$$\mathcal{L} = \underbrace{\alpha_{\text{diff}} \mathcal{L}_{\text{diffusion}} + \alpha_{\text{dist}} \mathcal{L}_{\text{distogram}}}_{\text{all data (PDB + synthetic)}} + \underbrace{\alpha_{\text{conf}} \left(\mathcal{L}_{\text{pLDDT}} + \mathcal{L}_{\text{PDE}} + \alpha_{\text{PAE}} \mathcal{L}_{\text{PAE}} + \mathcal{L}_{\text{resolved}}\right)}_{\text{PDB experimental data only}}$$
+$$
+\mathcal{L} = \underbrace{\alpha_{\text{diff}} \mathcal{L}_{\text{diffusion}} + \alpha_{\text{dist}} \mathcal{L}_{\text{distogram}}}_{\text{all data (PDB + synthetic)}} + \underbrace{\alpha_{\text{conf}} \left(\mathcal{L}_{\text{pLDDT}} + \mathcal{L}_{\text{PDE}} + \alpha_{\text{PAE}} \mathcal{L}_{\text{PAE}} + \mathcal{L}_{\text{resolved}}\right)}_{\text{PDB experimental data only}}
+$$
 
 The structure losses (diffusion, distogram) are trained on all data — both experimental PDB structures and synthetic pseudo-labeled structures. But the confidence losses (pLDDT, PDE, PAE, experimentally resolved) are trained exclusively on PDB data, where the ground truth structure is known from experiment.
 
@@ -322,7 +338,9 @@ With PDB experimental data, the model can learn the corrective signal: "I predic
 
 A confidence score is only useful if it is *calibrated* — meaning that a pLDDT of 90 should correspond to approximately 90% of predictions at that confidence level being accurate. Formally, calibration requires:
 
-$$P\left(\text{lDDT}_i \geq s \;\middle|\; \text{pLDDT}_i = s\right) \approx s, \quad \forall s \in [0, 1]$$
+$$
+P\left(\text{lDDT}_i \geq s \;\middle|\; \text{pLDDT}_i = s\right) \approx s, \quad \forall s \in [0, 1]
+$$
 
 Well-calibrated confidence enables trustworthy decision-making downstream. A drug discovery team that sees pLDDT = 0.90 can allocate wet-lab resources accordingly; a protein engineer who sees pLDDT = 0.55 knows to seek alternative validation. This decision-making value collapses if the calibration curve is distorted.
 
@@ -407,14 +425,14 @@ Given this analysis, we can assess the reliability of each model's confidence es
 |---|---|---|---|
 | **AF3** | PDB only | Loss separation by design | Low |
 | **OpenFold3** | PDB only (AF3 protocol) | Same as AF3 | Low |
-| **AF2** | Distillation + PDB | Low-confidence residues masked ($c_i < 0.5$) | Medium |
+| **AF2** | Distillation + PDB | Low-confidence residues masked (c_i < 0.5) | Medium |
 | **Boltz-1** | Distillation + PDB | Last 15K steps PDB only (partial recalibration) | Medium |
-| **Boltz-2** | All data (lDDT $\geq$ 0.5) | None — sampling ratio only | High |
-| **SeedFold** | All data (pLDDT $\geq$ 0.8) | None — threshold only | High |
+| **Boltz-2** | All data (lDDT ≥ 0.5) | None — sampling ratio only | High |
+| **SeedFold** | All data (pLDDT ≥ 0.8) | None — threshold only | High |
 
-AF3 and OpenFold3 are protected by design. AF2 has partial protection through residue-level masking — residues with KL-divergence $c_i < 0.5$ are excluded from loss, which removes the most obviously uncertain regions. However, residues with $c_i > 0.5$ that are still systematically wrong remain included. Boltz-1's switch to PDB-only data in the final 15K training steps may partially recalibrate confidence, though it is unclear whether this was an intentional design for calibration or simply a training schedule choice.
+AF3 and OpenFold3 are protected by design. AF2 has partial protection through residue-level masking — residues with KL-divergence c_i < 0.5 are excluded from loss, which removes the most obviously uncertain regions. However, residues with c_i > 0.5 that are still systematically wrong remain included. Boltz-1's switch to PDB-only data in the final 15K training steps may partially recalibrate confidence, though it is unclear whether this was an intentional design for calibration or simply a training schedule choice.
 
-Boltz-2 and SeedFold are the most vulnerable. Boltz-2 trains confidence on all data with only a very permissive lDDT $\geq$ 0.5 threshold, meaning substantially inaccurate pseudo-labels contribute to confidence learning. SeedFold trains on 26.5M synthetic structures — 147 times the size of PDB — with no confidence loss separation, meaning the vast majority of the confidence learning signal comes from pseudo-labels rather than ground truth.
+Boltz-2 and SeedFold are the most vulnerable. Boltz-2 trains confidence on all data with only a very permissive lDDT ≥ 0.5 threshold, meaning substantially inaccurate pseudo-labels contribute to confidence learning. SeedFold trains on 26.5M synthetic structures — 147 times the size of PDB — with no confidence loss separation, meaning the vast majority of the confidence learning signal comes from pseudo-labels rather than ground truth.
 
 ### Practical Recommendation
 
@@ -468,7 +486,7 @@ Two important directions remain outside the scope of this Part. **Iterative self
 
 **Next: Part 4 — The Road Ahead: Data Flywheels, Foundation Models, and Open Questions**
 
-In the final Part, we look beyond individual techniques to the systemic questions: Can the data flywheel (better teacher $\to$ better data $\to$ better student $\to$ repeat) sustain indefinite improvement, or does model collapse set a ceiling? How do protein language models like ESM-2 change the role of SSL? And what fundamental challenges in confidence calibration and data quality remain unsolved?
+In the final Part, we look beyond individual techniques to the systemic questions: Can the data flywheel (better teacher → better data → better student → repeat) sustain indefinite improvement, or does model collapse set a ceiling? How do protein language models like ESM-2 change the role of SSL? And what fundamental challenges in confidence calibration and data quality remain unsolved?
 
 ---
 
@@ -480,20 +498,20 @@ In the final Part, we look beyond individual techniques to the systemic question
 
 | Symbol | Meaning |
 |---|---|
-| $\theta$ | Student model parameters |
-| $\theta'$ | Teacher (EMA) model parameters |
-| $\mathcal{D}_L$ | Labeled dataset (PDB experimental structures) |
-| $\hat{\mathcal{D}}_U$ | Pseudo-labeled dataset (synthetic/distilled structures) |
-| $\alpha(x)$ | Weak augmentation of input $x$ |
-| $\mathcal{A}(x)$ | Strong augmentation of input $x$ |
-| $\tau$ | Confidence threshold |
-| $w(\cdot)$ | Sample weight function |
+| θ | Student model parameters |
+| θ' | Teacher (EMA) model parameters |
+| D_L | Labeled dataset (PDB experimental structures) |
+| D̂_U | Pseudo-labeled dataset (synthetic/distilled structures) |
+| α(x) | Weak augmentation of input x |
+| A(x) | Strong augmentation of input x |
+| τ | Confidence threshold |
+| w(·) | Sample weight function |
 | pLDDT | Predicted Local Distance Difference Test (confidence metric) |
 | FAPE | Frame Aligned Point Error (structure loss) |
-| $\mathbf{x}_0$ | Clean 3D coordinates |
-| $\mathbf{x}_t$ | Noised coordinates at diffusion timestep $t$ |
-| $z$ | Pair representation |
-| $D_\theta$ | Denoiser network parameterized by $\theta$ |
+| x₀ | Clean 3D coordinates |
+| x_t | Noised coordinates at diffusion timestep t |
+| z | Pair representation |
+| D_θ | Denoiser network parameterized by θ |
 
 ## References
 

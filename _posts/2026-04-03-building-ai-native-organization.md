@@ -1,6 +1,6 @@
 ---
 title: "Building an AI-Native Organization: From Copilots to Company Intelligence"
-date: 2026-04-04 09:00:00 +0900
+date: 2026-04-03 09:00:00 +0900
 categories: [AI & ML, AI in Practice]
 tags: [ai-native, organization, knowledge-management, ai-agent, compound-intelligence]
 ---

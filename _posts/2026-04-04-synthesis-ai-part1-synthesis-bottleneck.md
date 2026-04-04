@@ -21,7 +21,7 @@ math: true
 
 ## 1. Introduction: The Amdahl's Law of Drug Discovery
 
-Drug discovery runs on cycles. We design a molecule, make it, test it, learn from the results, and design the next one. This **Design-Make-Test-Learn (DMTA)** loop is the heartbeat of every drug program — a typical small-molecule lead optimization campaign runs 10-15 full cycles per year. AI has compressed the Design step by orders of magnitude. But a strange asymmetry has emerged.
+Drug discovery runs on cycles. We design a molecule, make it, test it, learn from the results, and design the next one. This **Design-Make-Test-Analysis (DMTA)** loop is the heartbeat of every drug program — a typical small-molecule lead optimization campaign runs 10-15 full cycles per year. AI has compressed the Design step by orders of magnitude. But a strange asymmetry has emerged.
 
 **The overall cycle time is governed by its slowest stage, not its fastest — and Make is overwhelmingly the slowest.**
 
@@ -297,7 +297,7 @@ Given reactants and (optionally) conditions, predict the product. This is the fo
 Given a target molecule, propose a synthetic route — a tree of reactions leading back to purchasable starting materials. Requires single-step retrosynthetic models and multi-step search algorithms (MCTS, A*, beam search).
 
 - Core challenge: Evaluating route quality beyond step count — considering yield, cost, practicality
-- Key tools: ASKCOS (Coley et al., MIT), AiZynthFinder (Thakkar et al., AstraZeneca), Synthia (Grzybowski, KAIST/Allchemy)
+- Key tools: ASKCOS (Coley et al., MIT), AiZynthFinder (Thakkar et al., AstraZeneca), Synthia (Grzybowski, UNIST/Allchemy)
 - **Depends on Part 2**: Each proposed retrosynthetic step must be validated by a forward model
 
 **Part 4 — Synthesis-Aware Design: "Generate makeable molecules"**
@@ -346,7 +346,7 @@ The field is structured around four research axes. Understanding who is working 
 |---------------|-------------|-------------------|-----------|
 | **Connor Coley** | MIT | ASKCOS platform, higher-level retro strategies (2026) | Moving beyond simple disconnections to strategy-level planning — protecting groups, functional group interconversions, convergent routes. "Think like a chemist" |
 | **AstraZeneca** (Thakkar, Genheden et al.) | AstraZeneca | AiZynthFinder, RAscore, 3-year industrial deployment report | Industrial deployment at scale. Configurable expansion policies, stock management, integration with med chem workflows |
-| **Bartosz Grzybowski** | KAIST / Allchemy | Synthia (Chematica), 50K+ expert-encoded rules | Expert knowledge + ML hybrid. Hand-coded rules for accuracy, ML for scalability. Has demonstrated total synthesis-level route planning |
+| **Bartosz Grzybowski** | UNIST / Allchemy | Synthia (Chematica), 50K+ expert-encoded rules | Expert knowledge + ML hybrid. Hand-coded rules for accuracy, ML for scalability. Has demonstrated total synthesis-level route planning |
 | **Marwin Segler** | Microsoft Research | Early neural retrosynthesis (2017), Syntheseus framework (2024) | Unified benchmarking framework. Systematic comparison of retro models + search algorithms in all combinations |
 
 **Key tension in this axis**: Rules vs. learning. Grzybowski's Synthia encodes 50,000+ expert rules and achieves remarkable accuracy on complex targets, but scaling requires ongoing expert curation. Coley's and AstraZeneca's ML-based approaches learn from data and scale easily, but struggle with rare or novel disconnections. Segler's Syntheseus framework enables fair comparison across these approaches.
@@ -406,7 +406,7 @@ The four axes are not independent. Research groups and their outputs flow across
               ┌─────────────────────────────┐     │ Axes 1-3
               │  Coley (MIT) ──────────────────────┤
               │  AstraZeneca                │     │
-              │  Grzybowski (KAIST)         │     │
+              │  Grzybowski (UNIST)         │     │
               │  Segler (Microsoft)         │     │
               └──────────────┬──────────────┘     │
                              │ route evaluation     │

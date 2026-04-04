@@ -262,7 +262,7 @@ The platform has evolved significantly since its initial release. AiZynthFinder 
 
 **Synthia (formerly Chematica)**
 
-Synthia stands apart from the ML-first approaches. Developed over two decades by Bartosz Grzybowski's group (originally at Northwestern, then KAIST/Allchemy), Synthia encodes expert chemical knowledge directly:
+Synthia stands apart from the ML-first approaches. Developed over two decades by Bartosz Grzybowski's group (originally at Northwestern, then UNIST/Allchemy), Synthia encodes expert chemical knowledge directly:
 
 - **50,000+ hand-coded reaction rules** curated by expert chemists, covering named reactions, strategic transformations, and protecting group chemistry
 - Network-based search (not MCTS) over a massive graph of chemical transformations

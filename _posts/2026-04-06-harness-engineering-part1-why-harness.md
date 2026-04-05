@@ -117,11 +117,11 @@ Both metaphors fit. Your LLM is a component. The harness is what makes the compo
 Harness Engineering is the third wave of LLM engineering disciplines.
 
 ```
-  2022             2023             2024+
-  ────             ────             ─────
- Prompt   →      Context   →      Harness
-Engineering   Engineering    Engineering
-  ────             ────             ─────
+  2022–2023        2024–2025         2025–2026+
+  ─────────        ─────────         ──────────
+   Prompt     →     Context     →     Harness
+ Engineering     Engineering       Engineering
+  ─────────        ─────────         ──────────
 "What do I ask?" "What do I show?" "How do I loop?"
 ```
 
@@ -133,7 +133,7 @@ Techniques: few-shot examples, chain-of-thought, role prompting, delimiters, out
 
 **Why it stopped being enough**: Single calls can't handle tasks with unpredictable steps. You can't prompt your way out of a 100-step task.
 
-### Era 2: Context Engineering (2023–2024)
+### Era 2: Context Engineering (2024–2025)
 
 **Unit of work**: The input window.
 
@@ -141,7 +141,7 @@ Techniques: RAG, retrieval, chunking, compression, re-ranking, dynamic context a
 
 **Why it stopped being enough**: A well-constructed context doesn't prevent the agent from drifting over 50 turns. Context engineering assumes one shot. Long-running tasks are many shots.
 
-### Era 3: Harness Engineering (2024+)
+### Era 3: Harness Engineering (2025–2026+)
 
 **Unit of work**: The entire system around the model.
 

@@ -1,6 +1,6 @@
 ---
 title: "Harness Engineering Part 1: Why It Matters — The Shift Beyond Prompts and Context"
-date: 2026-04-06 09:00:00 +0900
+date: 2026-04-06 00:30:00 +0900
 categories: [AI & ML, AI Agent]
 tags: [harness-engineering, ai-agent, claude-code, workflow, multi-agent, anthropic]
 ---

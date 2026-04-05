@@ -1,6 +1,6 @@
 ---
 title: "Harness Engineering Part 2: Self-Improving Harnesses — Lessons from Meta-Harness Research"
-date: 2026-04-06 09:10:00 +0900
+date: 2026-04-06 00:40:00 +0900
 categories: [AI & ML, AI Agent]
 tags: [harness-engineering, meta-harness, claude-code, self-improvement, ai-agent, research]
 math: true

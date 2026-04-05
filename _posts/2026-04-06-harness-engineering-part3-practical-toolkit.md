@@ -1,6 +1,6 @@
 ---
 title: "Harness Engineering Part 3: In Practice — Tools, Patterns, and Starting Points"
-date: 2026-04-06 09:20:00 +0900
+date: 2026-04-06 00:50:00 +0900
 categories: [AI & ML, AI Agent]
 tags: [harness-engineering, langgraph, crewai, autogen, claude-code, revfactory, ai-agent]
 ---

@@ -2,7 +2,7 @@
 title: "Harness Engineering Part 3: In Practice — Tools, Patterns, and Starting Points"
 date: 2026-04-06 00:50:00 +0900
 categories: [AI & ML, AI Agent]
-tags: [harness-engineering, langgraph, crewai, autogen, claude-code, revfactory, ai-agent]
+tags: [harness-engineering, langgraph, crewai, autogen, claude-code, revfactory, gstack, openharness, ai-agent]
 ---
 
 **Harness Engineering: From Concept to Practice**
@@ -102,6 +102,7 @@ The harness tooling ecosystem is starting to stratify into clear layers.
 ┌─────────────────────────────────────────────────────────────┐
 │  LAYER 3: Meta / Auto-Harness                               │
 │  ─────────────────────────────────                          │
+│  • gstack — opinionated sprint workflow (23 skills)         │
 │  • revfactory/harness (Claude Code plugin)                  │
 │  • harness-100 (template library)                           │
 │  • Meta-Harness (research, self-improvement loops)          │
@@ -119,6 +120,7 @@ The harness tooling ecosystem is starting to stratify into clear layers.
 │  LAYER 1: Low-Level Orchestration                           │
 │  ─────────────────────────────────                          │
 │  • LangGraph — StateGraph + checkpointing + HITL            │
+│  • OpenHarness — lightweight open-source agent harness      │
 │  • Temporal — durable workflow orchestration                │
 │  • Prefect — dataflow orchestration                         │
 │  • Raw SDK (Anthropic, OpenAI) — direct primitives          │
@@ -149,7 +151,9 @@ The harness tooling ecosystem is starting to stratify into clear layers.
 | **CrewAI** | L2 | Role metaphor | Non-developer-friendly team design | You need low-level control |
 | **OpenAI Swarm** | L2 | Minimal handoff | Learning, simple multi-agent | Production systems |
 | **Claude Code** | L2/3 | Agentic CLI | Coding tasks, file ops | Non-coding workflows |
+| **OpenHarness** | L1 | Lightweight open-source harness | Multi-provider agents, research | Need battle-tested production infra |
 | **revfactory/harness** | L3 | Meta-skill for Claude Code | Quick team-of-agents prototyping | Non-Claude-Code users |
+| **gstack** | L3 | Opinionated sprint workflow | Shipping production code in Claude Code | Non-standard dev workflows |
 
 ### Quick Decision Tree
 
@@ -158,7 +162,14 @@ What environment are you in?
 │
 ├── Already using Claude Code?
 │     │
-│     └─→ Try revfactory/harness first
+│     ├── Shipping production code (plan → build → QA → deploy)?
+│     │     └─→ gstack (opinionated sprint workflow)
+│     │
+│     ├── Need domain-specific agent teams?
+│     │     └─→ revfactory/harness (auto-generated teams)
+│     │
+│     └── Unsure?
+│           └─→ Start with gstack for shipping, harness for exploration
 │
 ├── Building production customer-facing?
 │     │
@@ -168,9 +179,13 @@ What environment are you in?
 │     └── Multi-agent conversational?
 │           └─→ AutoGen or CrewAI
 │
+├── Want multi-provider flexibility (open source)?
+│     │
+│     └─→ OpenHarness (Claude + OpenAI + GitHub Copilot)
+│
 ├── Research / experimentation?
 │     │
-│     └─→ Raw SDK, then LangGraph
+│     └─→ Raw SDK, then LangGraph or OpenHarness
 │
 └── Non-developer stakeholders in the loop?
       │
@@ -338,6 +353,170 @@ A/B testing by the author showed:
 
 ---
 
+## Deep Dive 3: gstack — The Sprint Workflow Harness
+
+If `revfactory/harness` is "generate an agent team for any domain," **gstack is "here's the exact team you need to ship production code."** Built by YC CEO Garry Tan, who used it to ship **600,000+ lines of code in 60 days** while running YC full-time. 64.8k GitHub stars.
+
+### Philosophy
+
+gstack treats the software development cycle as a structured sprint:
+
+```
+Think → Plan → Build → Review → Test → Ship → Reflect
+```
+
+Each stage has **dedicated skills** that embody specific professional roles — not a generalist assistant, but a CEO reviewer, an engineering lead, a QA tester, a security officer. The model isn't doing everything; each skill constrains the agent to one perspective.
+
+### 23 Specialized Skills
+
+| Stage | Skills | What they do |
+|---|---|---|
+| **Plan** | `/office-hours`, `/plan-ceo-review`, `/plan-eng-review`, `/autoplan` | Product discovery, architecture validation, sprint planning |
+| **Design** | `/design-consultation`, `/design-shotgun`, `/design-html` | Design systems, variant generation, production HTML |
+| **Build** | `/browse`, `/codex`, `/investigate` | Persistent browser automation, multi-AI code review, debugging |
+| **QA** | `/qa` | Real browser testing, atomic commits per bug, health scoring |
+| **Review** | `/review` | Multi-stage PR analysis, parallel specialist review, adversarial review (Claude + Codex) |
+| **Security** | `/cso` | 15-phase vulnerability scan (OWASP + STRIDE) |
+| **Ship** | `/ship`, `/land-and-deploy`, `/canary` | Pre-merge automation, merge-to-prod, staged rollout |
+| **Reflect** | `/retro` | Weekly metrics across projects |
+
+### The Killer Feature: Persistent Browser QA
+
+gstack runs a **long-lived headless Chromium daemon** — not a fresh browser per command. This means:
+
+- **100-200ms command execution** (vs. 2-3 seconds for fresh launches)
+- **Persistent login state** — the QA agent stays authenticated across tests
+- **Real UI interactions** — clicks, forms, navigation, not mocked endpoints
+- **Before/after diffs** — visual regression detection
+
+```
+┌─────────────────────────────────────────────────────┐
+│                gstack /qa                            │
+│                                                     │
+│  ┌──────────┐     ┌──────────┐     ┌──────────┐   │
+│  │ Browse   │────→│ Find bug │────→│ Fix +    │   │
+│  │ real app │     │ (UI/UX)  │     │ atomic   │   │
+│  │ (100ms)  │     │          │     │ commit   │   │
+│  └──────────┘     └──────────┘     └────┬─────┘   │
+│                                         │          │
+│                                         ▼          │
+│                                    [Next bug]      │
+│                                    loop until       │
+│                                    health score OK  │
+└─────────────────────────────────────────────────────┘
+```
+
+### Adversarial Code Review
+
+The `/review` skill doesn't just run one AI reviewer — it dispatches **independent Claude + Codex reviewers**, then deduplicates findings. Different models catch different blind spots. This is defense-in-depth for code quality.
+
+### When gstack Fits
+
+- **Individual developers or small teams shipping production code** — the sprint workflow matches real eng practice
+- **You want strong opinions** — gstack tells you *how* to work, not just *what tools* to use
+- **You need real QA** — persistent browser automation is unique in this space
+
+### When gstack Doesn't Fit
+
+- **Non-standard development workflows** — the 23 skills are opinionated and may clash
+- **You're not on Claude Code** — gstack is tightly coupled to the Claude Code runtime
+- **You need domain-specific agents** — gstack is for software development, not arbitrary domains (use `revfactory/harness` for that)
+
+### gstack vs revfactory/harness
+
+| | gstack | revfactory/harness |
+|---|---|---|
+| **Approach** | Prescriptive: "follow this sprint" | Generative: "describe your domain, I'll design a team" |
+| **Skills** | 23 pre-built, software-dev focused | Auto-generated per domain |
+| **Customization** | Templates (.tmpl) | Natural language prompts |
+| **Strength** | Shipping code fast with quality gates | Flexible agent composition for any domain |
+| **Stars** | 64.8k | 2.5k |
+
+**They're complementary, not competing.** Use gstack for your daily coding workflow. Use `revfactory/harness` when you need a custom agent team for a non-coding domain.
+
+---
+
+## Deep Dive 4: OpenHarness — The Lightweight Open-Source Reference
+
+[OpenHarness](https://github.com/HKUDS/OpenHarness) (HKUDS, Hong Kong University) is the **first open-source implementation of the formal "Agent Harness" pattern** defined in recent research (Meta-Harness, Natural-Language Agent Harnesses). It delivers Claude-Code-like functionality in **~11,700 lines of Python** — roughly 3% of Claude Code's codebase.
+
+### Why It Matters
+
+OpenHarness is not trying to replace Claude Code or LangGraph. It's a **reference implementation** that answers: "What does a minimal, functional agent harness actually look like in code?"
+
+If LangGraph is the production-grade framework and Claude Code is the polished product, OpenHarness is the **textbook implementation** — readable, hackable, and provider-agnostic.
+
+### Architecture (10 Subsystems)
+
+```
+┌──────────────────────────────────────────────┐
+│              OpenHarness Core                 │
+│                                              │
+│  ┌────────┐  ┌────────┐  ┌────────┐         │
+│  │ Engine │  │Toolkit │  │ Skills │         │
+│  │ (loop) │  │(43+tools)│ │(40+ md)│        │
+│  └───┬────┘  └───┬────┘  └───┬────┘         │
+│      └───────────┼───────────┘               │
+│                  ▼                            │
+│  ┌────────┐  ┌────────┐  ┌────────┐         │
+│  │Plugins │  │Permis- │  │Memory  │         │
+│  │        │  │sions   │  │& State │         │
+│  └────────┘  └────────┘  └────────┘         │
+│                  ▼                            │
+│  ┌────────┐  ┌────────┐  ┌────────┐         │
+│  │ Swarm  │  │ Hooks  │  │ Config │         │
+│  │(multi) │  │        │  │ & UI   │         │
+│  └────────┘  └────────┘  └────────┘         │
+└──────────────────────────────────────────────┘
+         │              │              │
+         ▼              ▼              ▼
+    Anthropic       OpenAI-       GitHub
+    (Claude)      compatible      Copilot
+                  (DeepSeek,
+                   Ollama, ...)
+```
+
+### Multi-Provider: The Key Differentiator
+
+Unlike Claude Code (Anthropic-only) or gstack (Claude Code-dependent), OpenHarness supports:
+
+- **Anthropic format**: Claude, Moonshot/Kimi, Bedrock, Vertex
+- **OpenAI format**: OpenAI, DeepSeek, Groq, Ollama, local instances
+- **GitHub Copilot**: OAuth device flow, no API keys required
+
+**This makes it the only harness in this list that lets you switch providers without changing your harness code.** For cost-conscious teams or researchers benchmarking across models, this is significant.
+
+### What's Good
+
+- **Code density**: 11,700 lines for near-parity with Claude Code is remarkable engineering
+- **Anthropic ecosystem compatibility**: CLAUDE.md files, skills, and plugins work unchanged
+- **Production signals**: 114+ tests, exponential backoff, token/cost tracking, permission model
+- **Hackability**: Small codebase means you can read and modify the entire harness
+
+### What's Early
+
+- **v0.1.0** (released April 1, 2026) — 5,450 stars but only days old
+- **No published benchmarks** against Claude Code or LangGraph
+- **Multi-agent patterns exist** (Swarm subsystem) but lack real-world examples
+- **Documentation** is solid at README level but thin on architecture deep-dives
+
+### When to Use OpenHarness
+
+- **You want to understand harness internals** — read the source as a learning exercise
+- **You need multi-provider flexibility** — swap between Claude, GPT, DeepSeek, Ollama
+- **You're extending the harness for research** — small codebase means fast iteration
+- **You want Claude-Code-like features without vendor lock-in**
+
+### When Not to Use OpenHarness
+
+- **You need battle-tested production infrastructure** — use LangGraph
+- **You want a polished UX** — use Claude Code directly
+- **You need a rich ecosystem of integrations** — LangChain/LangGraph has far more
+
+> **Watch this space**: If OpenHarness delivers on its benchmarks and the community grows, it could become the "SQLite of agent harnesses" — the small, embeddable, reliable option that everyone reaches for when they don't need a full framework.
+
+---
+
 ## 5 Real-World Scenarios (And What to Use)
 
 Here are the scenarios you're probably facing, matched to tools and patterns.
@@ -390,9 +569,22 @@ Here are the scenarios you're probably facing, matched to tools and patterns.
 
 ### Scenario D: Claude Code Native
 
-**Example**: "I'm already in Claude Code, I need an agent team for codebase audits."
+**Example**: "I'm already in Claude Code, I need to ship a feature with plan, build, QA, and review."
 
-**Recommendation**: `revfactory/harness` plugin, Fan-out / Fan-in pattern.
+**Recommendation**: gstack for the sprint workflow. Use `/autoplan` → build → `/qa` → `/review` → `/ship`.
+
+```
+[/autoplan] → [Build] → [/qa (browser)] → [/review (adversarial)] → [/ship]
+                             │                      │
+                             └── fix + atomic ───────┘
+                                 commit per bug
+```
+
+- **Tools**: gstack (23 skills covering the full sprint cycle)
+- **Pattern**: Pipeline with evaluator-optimizer loops at QA and review stages
+- **Don't**: Skip `/qa`. The persistent browser automation catches real UI bugs that unit tests miss.
+
+**Alternative**: If your task is a custom domain (not standard software dev), use `revfactory/harness` to generate a domain-specific agent team instead.
 
 ```
 [Auditor]
@@ -402,9 +594,8 @@ Here are the scenarios you're probably facing, matched to tools and patterns.
     └── merge ────── [Report aggregator]
 ```
 
-- **Tools**: `revfactory/harness` + harness-100 code-review template
+- **Tools**: `revfactory/harness` + harness-100 templates
 - **Pattern**: Fan-out / Fan-in
-- **Don't**: Reinvent. Start from the template, customize.
 
 ### Scenario E: Research / Experimental
 
@@ -535,10 +726,11 @@ Want to go from reading this series to shipping a harness? Here's a sequenced pa
 - [ ] Re-implement one workflow pattern as a StateGraph
 - [ ] Add a checkpointer, simulate a failure, resume
 
-### Week 3: revfactory/harness
+### Week 3: Claude Code Harness Tools
 
-- [ ] Install `revfactory/harness` in Claude Code
-- [ ] Generate a harness for a real project (your own code)
+- [ ] Install gstack and run `/qa` + `/review` on a real project
+- [ ] Install `revfactory/harness` and generate a custom agent team
+- [ ] Compare: gstack's opinionated sprint vs harness's flexible composition
 - [ ] Read 3 templates from harness-100 and analyze their structure
 
 ### Week 4: Ship Something
@@ -597,9 +789,14 @@ Model capability is catching up. Harness quality is still a moat.
 **Research**
 - Meta-Harness (arxiv 2603.28052)
 
+**Research**
+- Natural-Language Agent Harnesses (arxiv 2603.25723)
+
 **OSS Projects**
-- [revfactory/harness](https://github.com/revfactory/harness)
-- [revfactory/harness-100](https://github.com/revfactory/harness-100)
+- [gstack](https://github.com/garrytan/gstack) — Sprint workflow harness for Claude Code (64.8k stars)
+- [OpenHarness](https://github.com/HKUDS/OpenHarness) — Lightweight open-source agent harness (5.4k stars)
+- [revfactory/harness](https://github.com/revfactory/harness) — Meta-skill for Claude Code agent teams
+- [revfactory/harness-100](https://github.com/revfactory/harness-100) — 100 harness templates
 - [LangGraph](https://github.com/langchain-ai/langgraph)
 - [AutoGen](https://github.com/microsoft/autogen)
 - [CrewAI](https://github.com/crewAIInc/crewAI)

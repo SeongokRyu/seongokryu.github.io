@@ -101,6 +101,47 @@ Claude Code is the clearest production example of this pattern [[Penligent](http
 
 The LLM routes **naturally** between tools based on task descriptions — no explicit routing logic required. When you ask "check the latest PR and post a summary to Slack," it uses `gh` (CLI) for the PR and the Slack MCP server for posting.
 
+### BKit: PDCA as a Harness Plugin
+
+While Claude Code implements the Three-Loop Architecture **internally**, **BKit** implements it **externally** — as a plugin that wraps Claude Code, Gemini CLI, and Codex CLI with a structured PDCA (Plan-Do-Check-Act) workflow [[GitHub](https://github.com/popup-studio-ai/bkit-claude-code)].
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                     BKit Layer                           │
+│                                                          │
+│  Plan ──▶ Design ──▶ Do ──▶ Check ──▶ Act ──▶ Report    │
+│                              │                           │
+│                     gap-detector agent                   │
+│                     (design vs implementation            │
+│                      match rate ≥ 90%)                   │
+│                              │                           │
+│              ┌───────────────┼───────────────┐           │
+│              ▼               ▼               ▼           │
+│         Opus agents    Sonnet agents    Haiku agents     │
+│         (11: complex   (19: implement) (2: light        │
+│          reasoning)                     tasks)          │
+└──────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+              Claude Code / Gemini CLI / Codex CLI
+              (Three-Loop execution underneath)
+```
+
+Key design choices that map to harness engineering principles:
+
+- **37 skills** (18 workflow / 18 capability / 1 hybrid) loaded **per phase** — not all at once. This avoids the 50-Tool Firehose anti-pattern.
+- **Separate evaluator**: A `gap-detector` agent compares implementation against design docs. Match rate < 70% triggers automatic iteration (max 5 cycles). This is the Planner–Generator–Evaluator pattern enforced at the system level.
+- **6-layer hook system**: 18 event types (`SessionStart`, `PreToolUse`, `PostToolUse`, `PreCompact`, `Stop`, etc.) inject context at distinct lifecycle points.
+- **Cross-platform**: ~95% code reuse across Claude Code, Gemini CLI, and Codex CLI. Only manifest files and hook event names differ.
+- **Context preservation**: PDCA state survives compaction, improving context retention from 30-40% to 75-85%.
+
+BKit demonstrates that **the Three-Loop Architecture isn't just for framework builders** — it can be imposed on existing agents from the outside via hooks, skills, and MCP servers (`bkit-pdca`, `bkit-analysis`).
+
+**References:**
+- BKit for Claude Code — [github.com/popup-studio-ai/bkit-claude-code](https://github.com/popup-studio-ai/bkit-claude-code)
+- BKit for Gemini — [github.com/popup-studio-ai/bkit-gemini](https://github.com/popup-studio-ai/bkit-gemini)
+- BKit for Codex — [github.com/popup-studio-ai/bkit-codex](https://github.com/popup-studio-ai/bkit-codex)
+
 ---
 
 ## Tool Routing: How to Pick the Right Interface
@@ -140,6 +181,8 @@ Measured results: **37-46% reduction in LLM usage**, **32-38% latency improvemen
 ### Cost-Aware Routing
 
 oh-my-claudecode implements **model-level routing**: simple tasks (variable rename) go to Haiku (fast, cheap), complex tasks (architecture decisions) go to Opus. Claimed **30-50% token savings** [[oh-my-claudecode GitHub](https://github.com/anthropics/oh-my-claudecode)].
+
+BKit takes a different approach: **role-based routing with fixed model assignments**. 32 agents are pre-assigned — 11 to Opus (complex reasoning), 19 to Sonnet (implementation), 2 to Haiku (lightweight). The routing is deterministic by agent role, not dynamic by task complexity. This trades flexibility for consistency — every architecture decision always goes through Opus, every code generation always goes through Sonnet.
 
 **The cost hierarchy to internalize:**
 
@@ -524,6 +567,35 @@ Putting it all together — the full stack for a production agent system with in
 5. **State persisted**: Results written to filesystem. If the sandbox crashes at step 2, LangGraph checkpoint enables resume from step 1's result.
 6. **MCP Gateway**: All three MCP calls routed through gateway. Connection pooling prevents TCP timeouts. Schema filtering means only 3 tool schemas loaded, not 106.
 
+### Where RTK and BKit Fit
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  Methodology Layer ──── BKit (PDCA workflow, quality gates)    │
+│       │                 37 skills, 32 agents, gap-detector     │
+│       ▼                                                        │
+│  Harness Layer ──────── Three-Loop + GraphRAG + Routing        │
+│       │                                                        │
+│       ▼                                                        │
+│  Tool Interface Layer ─ CLI ─── MCP ─── Code Exec ─── Browser │
+│       │                  │                                     │
+│       ▼                  ▼                                     │
+│  Infrastructure ──────── RTK (CLI output compression, 60-90%) │
+│                         ICM (persistent memory, KG)            │
+│                         Grit (parallel agent git locking)      │
+└────────────────────────────────────────────────────────────────┘
+
+BKit pushes structure DOWN: methodology → harness → tool selection
+RTK pushes efficiency UP: infrastructure → tool interface → harness
+```
+
+BKit and RTK represent two complementary directions of harness optimization:
+
+- **BKit** operates **top-down** — it imposes methodology (PDCA) onto the agent, controlling *which* tools are available at each phase and *how* their outputs are evaluated. The gap-detector ensures quality; phase-aware skill loading ensures focus.
+- **RTK** operates **bottom-up** — it optimizes the *infrastructure* that tools run on, making every CLI call cheaper without changing what the agent does. A 70% token reduction across a session means more room for reasoning.
+
+Both validate the core thesis of this series: **tool interface orchestration is a multi-layer engineering discipline**, not a single protocol choice. The best systems optimize at every layer simultaneously.
+
 ---
 
 ## Eight Anti-Patterns to Avoid
@@ -584,7 +656,7 @@ Lessons extracted from production harness failures:
 
 **Problem**: Tools returning database dumps, binary data, massive JSON payloads.
 
-**Fix**: Tools should return filtered, relevant data. If a tool returns more than the model can process, the tool's interface is broken — fix the tool, not the model.
+**Fix**: Tools should return filtered, relevant data. If a tool returns more than the model can process, the tool's interface is broken — fix the tool, not the model. For CLI specifically, **RTK** intercepts command output and applies 12 filtering strategies (stats extraction, error-only, pattern grouping, deduplication) to compress 60-90% of noise before it reaches the agent — turning `cargo test` from 4,823 tokens to 11 [[github.com/rtk-ai/rtk](https://github.com/rtk-ai/rtk)].
 
 ---
 
@@ -719,3 +791,12 @@ The Planner–Generator–Evaluator architecture from Part 1 benefits directly f
 38. **Cognee: Knowledge Engine for AI Agents** — [github.com/topoteretes/cognee](https://github.com/topoteretes/cognee)
 39. **LlamaIndex GraphRAG v2** — [developers.llamaindex.ai](https://developers.llamaindex.ai/python/examples/cookbooks/graphrag_v2/)
 40. **Graphs Meet AI Agents: Taxonomy and Opportunities** — [arxiv:2506.18019](https://arxiv.org/html/2506.18019v1)
+
+### Production Harness Implementations
+
+41. **BKit for Claude Code** — [github.com/popup-studio-ai/bkit-claude-code](https://github.com/popup-studio-ai/bkit-claude-code)
+42. **BKit for Gemini CLI** — [github.com/popup-studio-ai/bkit-gemini](https://github.com/popup-studio-ai/bkit-gemini)
+43. **BKit for Codex CLI** — [github.com/popup-studio-ai/bkit-codex](https://github.com/popup-studio-ai/bkit-codex)
+44. **RTK: CLI Output Compression** (18.6k stars) — [github.com/rtk-ai/rtk](https://github.com/rtk-ai/rtk)
+45. **ICM: Persistent Memory for Agents** — [github.com/rtk-ai/icm](https://github.com/rtk-ai/icm)
+46. **Grit: Git for Parallel Agents** — [github.com/rtk-ai/grit](https://github.com/rtk-ai/grit)

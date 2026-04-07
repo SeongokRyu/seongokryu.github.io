@@ -150,6 +150,25 @@ MCP has **zero training data**. Every MCP tool call is a cold-start inference fr
 - **Codex CLI** — Adopted SKILL.md from Claude Code [[OpenAI](https://openai.com/index/introducing-codex/)]
 - **Aider** — Git-aware CLI coding assistant [[GitHub](https://github.com/Aider-AI/aider)]
 
+#### The CLI Output Problem — and RTK's Fix
+
+CLI's biggest weakness — unstructured output flooding the context window — has spawned its own optimization layer. **RTK** (Rust Token Killer) is a CLI proxy written in Rust that intercepts command output and compresses it before it reaches the agent [[GitHub, 18.6k stars](https://github.com/rtk-ai/rtk)].
+
+| Command | Raw tokens | After RTK | Reduction |
+|---------|-----------|-----------|-----------|
+| `cargo test` | ~4,823 | ~11 | 99% |
+| `git diff HEAD~1` | ~21,500 | ~1,259 | 94% |
+| `pytest -v` | ~756 | ~24 | 96% |
+
+A typical 30-minute Claude Code session drops from **~150,000 tokens to ~45,000** (70% savings). RTK processes commands through a six-phase pipeline (parse → route → execute → filter → print → track) with **12 filtering strategies** — stats extraction, error-only filtering, pattern grouping, deduplication, and more.
+
+The integration is invisible: a `PreToolUse` hook rewrites shell commands to `rtk` equivalents. The agent never knows the compression happened. This is **harness-level optimization** — no model changes, no prompt changes, just better infrastructure between the agent and the shell.
+
+RTK is part of a broader agent infrastructure ecosystem:
+
+- **ICM** — Persistent memory for agents via MCP-native knowledge graphs with typed relationships (`depends_on`, `contradicts`, `refines`) [[GitHub](https://github.com/rtk-ai/icm)]
+- **Grit** — Git for parallel agents with AST-level locking to prevent merge conflicts across 50+ concurrent agents [[GitHub](https://github.com/rtk-ai/grit)]
+
 ---
 
 ### 2. MCP: The USB-C of AI
@@ -548,6 +567,7 @@ Use this flowchart when choosing a tool interface:
 4. **Browser/Computer Use is the last resort.** Only when no API exists at all.
 5. **Lazy-load everything.** Don't pay 44,000 tokens for 43 schemas when you'll use 2.
 6. **Monitor token costs.** MCP's 32x overhead is invisible until you check your bill.
+7. **Compress CLI output.** Tools like RTK cut CLI token cost by 60-90% — the cheapest interface gets even cheaper.
 
 ---
 
@@ -562,6 +582,7 @@ MCP's schema bloat problem has spawned an entire subfield:
 | **Dynamic Toolsets** | 44K → 3K (93%) | Medium | [[Speakeasy](https://www.speakeasy.com/blog/how-we-reduced-token-usage-by-100x-dynamic-toolsets-v2)] |
 | **MCP Gateway** | 90% (schema filtering) | Medium | [[StackOne](https://www.stackone.com/blog/mcp-token-optimization/)] |
 | **SKILL.md Pattern** | 33% fewer tool calls | Low | [[Claude Code → Codex CLI → Gemini CLI](https://www.anthropic.com/engineering/claude-code-best-practices)] |
+| **RTK** (CLI output compression) | 60-90% CLI tokens | Low | [[GitHub](https://github.com/rtk-ai/rtk)] |
 | **RAG-MCP** | >50% + 3x accuracy | High | [[arxiv:2505.03275](https://arxiv.org/abs/2505.03275)] |
 
 The last entry — **RAG-MCP** — is a bridge to [Part 2](/posts/orchestrating-tool-interfaces-graphrag/), where we explore how **GraphRAG enables intelligent tool discovery** that makes schema bloat a non-issue.
@@ -633,3 +654,10 @@ These questions are the subject of **[Part 2: Orchestrating Tool Interfaces — 
 31. **Reducing MCP Token Usage by 100x** — [speakeasy.com](https://www.speakeasy.com/blog/how-we-reduced-token-usage-by-100x-dynamic-toolsets-v2)
 32. **RAG-MCP: Mitigating Prompt Bloat** — [arxiv:2505.03275](https://arxiv.org/abs/2505.03275)
 33. **The Protocol Wars** — [theregister.com](https://www.theregister.com/2026/01/30/agnetic_ai_protocols_mcp_utcp_a2a_etc/)
+
+### CLI Optimization
+
+34. **RTK: Rust Token Killer** (18.6k stars) — [github.com/rtk-ai/rtk](https://github.com/rtk-ai/rtk)
+35. **RTK Architecture** — [github.com/rtk-ai/rtk/ARCHITECTURE.md](https://github.com/rtk-ai/rtk/blob/master/ARCHITECTURE.md)
+36. **ICM: Persistent Memory for Agents** — [github.com/rtk-ai/icm](https://github.com/rtk-ai/icm)
+37. **Grit: Git for Parallel Agents** — [github.com/rtk-ai/grit](https://github.com/rtk-ai/grit)

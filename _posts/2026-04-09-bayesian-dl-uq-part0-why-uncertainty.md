@@ -398,4 +398,4 @@ In the next installment (Part 1), we formalize these ideas mathematically — in
 
 ---
 
-*Next: [Part 1 — The Language of Bayesian Inference](./01_bayesian_inference_language.md)*
+*Next: [Part 1 — The Language of Bayesian Inference](/posts/bayesian-dl-uq-part1-bayesian-language/)*
